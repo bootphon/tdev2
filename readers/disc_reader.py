@@ -34,6 +34,48 @@ import intervaltree
 
 from collections import defaultdict
 
+def overlap(disc, gold):
+    ov = (min(disc[1], gold[1]) - max(disc[0], gold[0]))\
+            /(gold[1] - gold[0])
+    time = min(disc[1], gold[1]) - max(disc[0], gold[0])
+    return ov, time
+def check_boundary(gold_times, disc_times): 
+    """ Consider phone discovered if the found interval overlaps 
+        with either more thant 50% or more than 30ms of the 
+        gold phone.
+
+        Input
+        :param gold_times: tuples, contains the timestamps of the gold phone
+        :type gold_times:  tuples of float
+        :param disc_times: tuples: contains the timestamps of the 
+                                   discovered phone
+        :type disc_times:  tuples of float
+
+        Output
+        :return:           Bool, True if phone is considered discovered, 
+                           False otherwise
+    """
+
+    gold_dur =  gold_times[1] - gold_times[0]
+    ov, ov_time = overlap(disc_times, gold_times)
+    # if gold phone is over 60 ms, rule is phone is considered if 
+    # overlap is over 30ms. Else, rule is phone considered if 
+    # overlap is over 50% of phone duration.
+    if ((gold_dur >= 0.060 and ov_time >= 0.030) or
+       (gold_dur < 0.060 and ov >= 0.5)):
+        return True
+    elif ((gold_dur >= 0.060 and ov_time < 0.030) or
+         (gold_dur < 0.060 and ov < 0.5)):
+        return False
+    else:
+        ipdb.set_trace()
+    
+    #if (ov_time >= 0.030):
+    #    return True
+    #elif (ov_time < 0.030) :
+    #    return False
+
+
 class Disc():
     def __init__(self, disc_path=None):
 
@@ -42,6 +84,7 @@ class Disc():
         self.disc_path = disc_path
         self.clusters = None
         self.intervals = None
+        self.transcription = None
         self.intervals_tree = None
         # set intervals
         self.read_clusters()
@@ -50,6 +93,19 @@ class Disc():
         return '\n'.join(
            '{} {} {}'.format(fname, t0, t1)
            for (fname, t0, t1) in self.intervals)
+    
+    def get_interval_transcription(self, fname, on, off):
+        """ Return the transcription of an interval """
+
+        if not self.transcription:
+            raise AttributeError('Must call interval2txt first to'
+                                 ' compute transcription for all intervals')
+        if (fname, on, off) not in self.intervals:
+            raise ValueError('Requested interval not in discovered intervals')
+
+        interval_idx = self.intervals.index((fname, on, off))
+        
+        return ' '.join(self.transcription[interval_idx][3])
 
     def read_clusters(self):
         """ Read discovered clusters """
@@ -88,6 +144,7 @@ class Disc():
 
         self.clusters = discovered
         self.intervals = list(intervals)
+
         print("{} unique intervals".format(len(self.intervals)))
 
     def read_intervals_tree(self):
@@ -96,7 +153,36 @@ class Disc():
         for fname in self.intervals:
             self.intervals_tree[fname] = intervaltree.IntervalTree.from_tuples(self.intervals[fname])
 
-    def intervals2txt(self, gold_wrd, gold_phn):
+    def intervals2txt(self, gold_phn):
         """ For each interval, check which gold phones are covered
-            and phonetically transcribe the intervals to phones."""
-        pass
+            and phonetically transcribe the intervals to phones.
+        """
+
+        ngram = []
+        transcription = []
+        #ipdb.set_trace()
+        for fname, disc_on, disc_off in self.intervals:
+
+            # Get all covered phones
+            covered = sorted([phn  for phn 
+                                  in gold_phn[fname].overlap(disc_on, disc_off)],
+                                  key=lambda times: times[0])
+            # Check if first and last phones are discovered
+            keep_first = check_boundary((covered[0][0], covered[0][1]),
+                                      (disc_on, covered[0][1]))
+            keep_last = check_boundary((covered[-1][0], covered[-1][1]),
+                                      (covered[-1][0], disc_off))
+
+            if keep_first:
+                ngram = [covered[0][2]]
+            else:
+                ngram = []
+
+            ngram += [ phn for on, off, phn in covered[1:-1]]
+
+            if keep_last and len(covered) > 1:
+                ngram += [covered[-1][2]]
+
+            transcription.append((fname, disc_on, disc_off, tuple(ngram)))
+        self.transcription = transcription
+
