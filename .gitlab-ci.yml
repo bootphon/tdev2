@@ -1,0 +1,22 @@
+before_script:
+  # load the requested modules on oberon
+  - module load anaconda/3 
+
+WDE-build:
+  stage: build
+  script:
+    # create a Python virtual environment dedicated to the test (if not existing)
+    - conda create --name WDE-ci python=3 2> /dev/null || true
+    - conda activate WDE-ci
+
+    # install the phonemizer
+    - pip install coverage
+    - python setup.py build
+    - python setup.py install
+
+WDE-test:
+  stage: test
+  script:
+    # run the unit tests within the CI environment
+    - conda activate WDE-ci
+    - python setup.py test
