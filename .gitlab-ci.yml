@@ -10,7 +10,7 @@ WDE-build:
     - conda activate WDE-ci
 
     # install the phonemizer
-    - pip install coverage
+    - pip install coverage intervaltree ipdb numpy pandas
     - python setup.py build
     - python setup.py install
 
