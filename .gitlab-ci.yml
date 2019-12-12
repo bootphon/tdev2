@@ -9,8 +9,8 @@ WDE-build:
     - conda create --name WDE-ci python=3 2> /dev/null || true
     - conda activate WDE-ci
 
-    # install the phonemizer
-    - pip install coverage intervaltree ipdb numpy pandas editdistance
+    # install WDE
+    - pip install coverage intervaltree ipdb numpy pandas editdistance pytest
     - python setup.py build
     - python setup.py install
 
@@ -19,4 +19,5 @@ WDE-test:
   script:
     # run the unit tests within the CI environment
     - conda activate WDE-ci
-    - python setup.py test
+      #- python setup.py test
+    - pytest
