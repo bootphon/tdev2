@@ -7,8 +7,8 @@ import setuptools
 
 setuptools.setup(
     # general description
-    name='TokenType',
-    description='Evaluation toolbox for the Token/Type measures',
+    name='WDE',
+    description='Evaluation toolbox for Word Discovery systems',
 
     # python package dependencies
     setup_requires=['pytest-runner'],
@@ -16,7 +16,7 @@ setuptools.setup(
 
     # packages for code and data
     packages=setuptools.find_packages(),
-    package_data={'TokenType': ['TokenType/*']},
+    package_data={'WDE': ['WDE/share/*']},
 
     # metadata for upload to PyPI
     author='Julien Karadayi, INRIA',
