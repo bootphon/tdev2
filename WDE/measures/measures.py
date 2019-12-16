@@ -10,26 +10,32 @@ class Measure():
     def __init__():
         pass
 
-    def __repr__():
-        pass
+    def __repr__(self):
+        return 'metric: {}\nrecall: {}\nprecision: {}\nfscore: {}'.format(
+                self.metric_name, self.recall, self.precision, self.fscore)
 
     @property
-    def precision():
-        pass
+    def precision(self):
+        raise  NotImplementedError('Should not use Measure.precision directly')
 
     @property
-    def recall():
-        pass
+    def recall(self):
+        raise  NotImplementedError('Should not use Measure.recall directly')
+
 
     @property
-    def fscore():
+    def fscore(self):
         if not (self.recall and self.precision):
             raise ValueError('Attempting to compute fscore when precision'
                              ' and recall are not yet computed!')
-        pass
+        return 2 * (self.precision * self.recall) / (self.precision + self.recall)
 
-    def write_score():
+    def write_score(self):
         if not self.fscore:
             raise AttributeError('Attempting to print scores but fscore'
                                  ' is not yet computed!')
-        pass
+        with open(self.output_folder, 'w') as fout:
+            fout.write("metric: {}\n".format(self.metric_name))
+            fout.write("precision: {}\n".format(self.precision))
+            fout.write("recall: {}\n".format(self.recall))
+            fout.write("fscore: {}\n".format(self.fscore))

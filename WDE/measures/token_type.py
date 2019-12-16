@@ -1,22 +1,21 @@
 import os
 import sys
 import ipdb
+import numpy as np
 
-#from TokenType.utils import check_boundary, overlap
-def overlap(disc, gold):
-    ov = (min(disc[1], gold[1]) - max(disc[0], gold[0]))\
-            /(gold[1] - gold[0])
-    time = min(disc[1], gold[1]) - max(disc[0], gold[0])
-    return ov, time
+from .measures import Measure
+from WDE.utils import overlap, check_boundary
 
-#class TokenType(Measures):
-class TokenType():
+class TokenType(Measure):
     def __init__(self, gold_phn, gold_wrd, disc):
+        self.metric_name = "token type"
         # get gold as interval trees
         self.gold_phn = gold_phn
-        assert type(gold_phn) == dict, "gold_phn should be a dict of intervaltree objects but is {} ".format(type(gold_phn))
+        assert type(gold_phn) == dict, ("gold_phn should be a dict "
+           "of intervaltree objects but is {} ".format(type(gold_phn)))
         self.gold_wrd = gold_wrd
-        assert type(gold_wrd) == dict, "gold_phn should be a dict of intervaltree objects but is {} ".format(type(gold_wrd))
+        assert type(gold_wrd) == dict, ("gold_phn should be a dict "
+           "of intervaltree objects but is {} ".format(type(gold_wrd)))
         self.all_type = set()
         self.n_token = 0
         for fname in self.gold_wrd:
@@ -34,46 +33,53 @@ class TokenType():
         self.token_hit = 0
         self.type_seen = set()
         self.token_seen = set()
+        self.token_prec = None
+        self.token_rec = None
+        self.type_prec = None
+        self.type_rec = None
 
+    @property
     def precision(self):
         """Return Token and Type precision"""
         # Token precision/recall
         if len(self.disc) == 0:
-            token_prec = np.nan
+            self.token_prec = np.nan
         else:
-            print('token_hit {}'.format(self.token_hit))
-            print('n_discovered {}'.format(len(self.disc)))
-            token_prec = self.token_hit / len(self.disc)
+            self.token_prec = self.token_hit / len(self.disc)
 
         # Types precision/recall
         if len(self.type_seen) == 0:
-            type_prec = np.nan
+            self.type_prec = np.nan
         else:
-            print('type_hit {}'.format(len(self.type_hit)))
-            print('type_covered {}'.format(len(self.type_seen)))
+            self.type_prec = len(self.type_hit) / len(self.type_seen)
 
-            type_prec = len(self.type_hit) / len(self.type_seen)
+        return self.token_prec, self.type_prec
 
-        return token_prec, type_prec
-
+    @property
     def recall(self):
         """Return Token and Type recall"""
         if self.n_token == 0:
-            token_rec = np.nan
+            self.token_rec = np.nan
         else:
-            print('n_token {}'.format(self.n_token))
-            token_rec = self.token_hit / self.n_token
-
+            self.token_rec = self.token_hit / self.n_token
+        # type recall
         if self.n_type == 0:
-            type_rec = np.nan
+            self.type_rec = np.nan
         else:
-            print('n_type {}'.format(self.n_type))
-            type_rec = len(self.type_hit) / self.n_type
+            self.type_rec = len(self.type_hit) / self.n_type
 
-        return token_rec, type_rec
+        return self.token_rec, self.type_rec
+
+    @property
     def fscore(self):
-        """Return token and Type fscore"""
-    
+        """Return Token and Type fscore"""
+        assert self.token_prec, ("Attempting to compute token fscore"
+                " when token precision is not computed yet.")
+        assert self.token_rec, ("Attempting to compute token fscore"
+                " when token recall is not computed yet.")
+        self.token_fscore = 2 * (self.token_prec * self.token_rec) / (self.token_prec + self.token_rec)
+        self.type_fscore = 2 * (self.type_prec * self.type_rec) / (self.type_prec + self.type_rec)
+        return self.token_fscore, self.type_fscore
 
     def compute_token_type(self):
         """ Loop over all intervals and compute token
@@ -100,13 +106,13 @@ class TokenType():
             Output:
             :return:         The Token Type measure
         """
-        log_interval = []
         for fname, disc_on, disc_off, ngram in self.disc:
             if fname not in self.gold_wrd:
                 raise ValueError('{}: file not found in gold'.format(fname))
 
             overlap_wrd = self.gold_wrd[fname].overlap(disc_on, disc_off)
-            
+           
+            ngram = tuple(phn for _, _, phn in ngram)
             # get type by getting ngram covered
             self.type_seen.add(tuple(ngram))
 
@@ -145,18 +151,8 @@ class TokenType():
                 self.token_hit +=1
                 self.token_seen.add((fname, gold_wrd_on, 
                       gold_wrd_off, gold_wrd_token))
-                log_interval.append((fname, disc_on, disc_off, '_'.join(ngram), gold_wrd_on, gold_wrd_off, gold_wrd_token))
-            else:
-                log_interval.append((fname, disc_on, disc_off, '_'.join(ngram), gold_wrd_on, gold_wrd_off, '-1'))
 
             if ((gold_wrd_trs == ngram) and 
                 not ngram in self.type_hit):
                 self.type_hit.add(ngram)
-
-
-        ## FOR DEBUGGING PURPOSES
-        with open('token.log', 'w') as fout:
-            for fn, don, doff, ngram, gon, goff, gw in log_interval:
-                fout.write(u'{} {} {} {} {} {} {}\n'.format(fn, don, doff, ngram, gon, goff, gw))
-
 

@@ -25,9 +25,60 @@ class Gold():
             dictionnaries.
             The interval tree of the silences can also be stored
         """
+        # paths
         self.vad_path = vad_path
         self.wrd_path = wrd_path
         self.phn_path = phn_path
+
+        # golds
+        self.boundaries = None
+        self.phones = None
+        self.words = None
+
+        # read alignments
+        self.words, _, self.ix2wrd, self.wrd2ix, self.boundaries = self.read_gold_intervalTree(self.wrd_path)
+        self.phones, _, self.ix2phn, self.phn2ix, _ = self.read_gold_intervalTree(self.phn_path)
+        #self.boundaries = self.get_boundaries()
+        
+
+    #def get_boundaries(self):
+    #    '''
+    #    Get the gold boundaries by comparing phone and word alignments
+    #    Return: 
+    #        :return: boundaries: dict, for each filename return a list
+    #                             of tuples (lower boundary, upper boundary,
+    #                                        lower phone, upper phone, word)
+    #    '''
+    #    if not os.path.isfile(self.phn_path):
+    #        raise ValueError('{}: Phone Alignment Not Found'.format(self.phn_path))
+    #    if not os.path.isfile(self.wrd_path):
+    #        raise ValueError('{}: Word Alignment Not Found'.format(self.phn_path))
+
+    #    # Read phone/word alignment using pandas
+    #    phn = pd.read_table(self.phn_path, sep=' ', header=None, encoding='utf8',
+    #            names=['file', 'start', 'end', 'symbol'])
+    #    wrd = pd.read_table(self.phn_path, sep=' ', header=None, encoding='utf8',
+    #            names=['file', 'start', 'end', 'symbol'])
+
+    #    # get lower boundaries and upper boundaries by merging dataframes
+    #    bound_low = pd.merge(phn, wrd, how='inner', on=['file', 'start'])
+    #    bound_high = pd.merge(phn, wrd, how='inner', on=['file', 'end'])
+
+    #    assert len(bound_low) == len(bound_high), ("phone and word alignement aren't"
+    #            " correctly aligned, the timestamps should correspond for beginnings"
+    #            " and endings of words")
+
+    #    # output boundaries
+    #    boundaries = dict()
+    #    for fname in phn['file'].unique():
+    #        lower = bound_low[bound_low['file'] == fname]['start'].values
+    #        upper = bound_high[bound_high['file'] == fname]['end'].values
+    #        #phn_low = bound_low[bound_low['file'] == fname]['symbol_x'].values
+    #        #phn_up = bound_high[bound_high['file'] == fname]['symbol_x'].values
+    #        #word = bound_low[bound_low['file'] == fname]['symbol_y'].values
+    #        #boundaries[fname] = list(zip(lower,upper,phn_low, phn_up, word))
+    #        boundaries[fname] = set(lower + upper)
+    #    return boundaries
 
     def read_gold_dict(self, gold_path):
         ''' 
@@ -95,13 +146,13 @@ class Gold():
         if not os.path.isfile(gold_path):
             raise ValueError('{}: File Not Found'.format(gold_path))
 
-
         # read the gold and create a list of tuples for each filename, then create an interval
         # tree from this list of tuple.
         intervals = defaultdict(list)
         gold = dict()
         symbols = set() # create a set of all the available symbols
         transcription = dict() # create dict that returns the transcription for an interval
+        boundaries = defaultdict(set)
         with open(gold_path, 'r') as fin:
             ali = fin.readlines()
 
@@ -110,6 +161,8 @@ class Gold():
                 transcription[(fname, float(on), float(off))] = symbol
                 symbols.add(symbol)
                 intervals[fname].append((float(on), float(off), symbol))
+                boundaries[fname].add(float(on))
+                boundaries[fname].add(float(off))
 
             # for each filename, create an interval tree
             for fname in intervals:
@@ -119,7 +172,11 @@ class Gold():
         symbol2ix = {v: k for k, v in enumerate(list(symbols))}
         ix2symbols = dict((v,k) for k,v in symbol2ix.items())
 
-        return gold, transcription, ix2symbols, symbol2ix
+        # Check that Silence is not present in alignments
+        if "SIL" in symbol2ix:
+            print("WARNING: Alignement contains silences, those may alter the results")
+
+        return gold, transcription, ix2symbols, symbol2ix, boundaries
 
     def get_intervals(fname, on, off, gold, transcription):
         """ Given a filename and an interval, retrieve the list of 
@@ -159,63 +216,4 @@ class Gold():
     def get_silence_intervals(self, vad):
         ''' Compute interval tree of silences '''
         pass
-
-    def wrd2phn(self):
-        '''Return dictionnary {wrd: (phn1, phn2, phn3)}'''
-
-
-    #@staticmethod
-    #def check_phn_boundaries(gold_bg, gold_ed, gold, classes, elem):
-    #    ''' check boundaries of discovered phone.
-    #        If discovered "word" contains 50% of a phone, or more than
-    #        30ms of a phone, we consider that phone discovered.
-    #        INPUT
-    #        gold_elem : tuplet, gold element (onset, offset, annotation)
-
-    #        disc_elem : tuplet, discovered element (onset, offset, annotation)
-
-    #        OUTPUT
-    #        check: bool, true if gold element is discovered.
-    #    '''
-    #    # get discovered phones timestamps
-    #    spkr, disc_bg, disc_ed = classes[elem]
-    #    # get first phone timestamps
-    #    first_ph_bg = gold[spkr]['start'][max(gold_bg-1,0)] # avoid taking last element if gold_bg = 0
-    #    first_ph_ed = gold[spkr]['end'][max(gold_bg-1,0)] # avoid taking last element if gold_bg = 0
-    #    first_ph_len = first_ph_ed - first_ph_bg
-    #    first_ph_ov = float(first_ph_ed - disc_bg)/first_ph_len
-
-    #    # get last phone timestamps
-    #    last_ph_bg = gold[spkr]['start'][min(gold_ed,len(gold[spkr]['start'])-1)]
-    #    last_ph_ed = gold[spkr]['end'][min(gold_ed,len(gold[spkr]['start'])-1)]
-    #    last_ph_len = last_ph_ed - last_ph_bg
-    #    last_ph_ov = float(disc_ed - last_ph_bg)/last_ph_len
-
-    #    #ipdb.set_trace()
-    #    # check overlap between first phone in transcription and discovered word
-    #    # Bugfix : when reading alignments, pandas approximates float values
-    #    # and it can lead to problems when th difference between the two compared 
-    #    # values is EXACTLY 0.03, so we have to round the values to 0.0001 precision ! 
-    #    if (round(first_ph_len,4) >= 0.060 and round((first_ph_ed - disc_bg),4) >= 0.030) or \
-    #       (round(first_ph_len,4) < 0.060 and first_ph_ov >= 0.5) and \
-    #       (gold_bg !=0 or disc_bg >first_ph_bg):
-    #        # avoid substracting - 1 when already first phone in Gold
-    #        first_ph_pos = gold_bg - 1 if gold_bg > 0 else 0 
-    #        
-    #    elif (gold_bg == 0 and disc_bg <= round(first_ph_bg,4)):
-    #        first_ph_pos = gold_bg
-    #    else:
-    #        first_ph_pos = gold_bg
-    #    
-    #    # check overlap between last phone in transcription and discovered word
-    #    # Bugfix : when reading alignments, pandas approximates float values
-    #    # and it can lead to problems when th difference between the two compared 
-    #    # values is EXACTLY 0.03, so we have to round the values to 0.0001 precision ! 
-    #    if (round(last_ph_len,4) >= 0.060 and round((disc_ed - last_ph_bg),4) >= 0.030) or \
-    #       (round(last_ph_len,4) < 0.060 and last_ph_ov >= 0.5):
-    #        # avoid adding + 1 if already last phone in Gold
-    #        last_ph_pos = gold_ed + 1 if gold_ed < len(gold[spkr]['end']) - 1  else gold_ed
-    #    else:
-    #        last_ph_pos = gold_ed
-    #    return first_ph_pos, last_ph_pos
 

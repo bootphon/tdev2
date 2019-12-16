@@ -33,48 +33,7 @@ import pandas as pd
 import intervaltree
 
 from collections import defaultdict
-
-def overlap(disc, gold):
-    ov = (min(disc[1], gold[1]) - max(disc[0], gold[0]))\
-            /(gold[1] - gold[0])
-    time = min(disc[1], gold[1]) - max(disc[0], gold[0])
-    return ov, time
-def check_boundary(gold_times, disc_times): 
-    """ Consider phone discovered if the found interval overlaps 
-        with either more thant 50% or more than 30ms of the 
-        gold phone.
-
-        Input
-        :param gold_times: tuples, contains the timestamps of the gold phone
-        :type gold_times:  tuples of float
-        :param disc_times: tuples: contains the timestamps of the 
-                                   discovered phone
-        :type disc_times:  tuples of float
-
-        Output
-        :return:           Bool, True if phone is considered discovered, 
-                           False otherwise
-    """
-
-    gold_dur =  gold_times[1] - gold_times[0]
-    ov, ov_time = overlap(disc_times, gold_times)
-    # if gold phone is over 60 ms, rule is phone is considered if 
-    # overlap is over 30ms. Else, rule is phone considered if 
-    # overlap is over 50% of phone duration.
-    if ((gold_dur >= 0.060 and ov_time >= 0.030) or
-       (gold_dur < 0.060 and ov >= 0.5)):
-        return True
-    elif ((gold_dur >= 0.060 and ov_time < 0.030) or
-         (gold_dur < 0.060 and ov < 0.5)):
-        return False
-    else:
-        ipdb.set_trace()
-    
-    #if (ov_time >= 0.030):
-    #    return True
-    #elif (ov_time < 0.030) :
-    #    return False
-
+from WDE.utils import overlap, check_boundary
 
 class Disc():
     def __init__(self, disc_path=None):
@@ -174,14 +133,16 @@ class Disc():
                                       (covered[-1][0], disc_off))
 
             if keep_first:
-                ngram = [covered[0][2]]
+                ngram = [(covered[0][0], covered[0][1],
+                          covered[0][2])]
             else:
                 ngram = []
 
-            ngram += [ phn for on, off, phn in covered[1:-1]]
+            ngram += [ (on, off, phn) for on, off, phn in covered[1:-1]]
 
             if keep_last and len(covered) > 1:
-                ngram += [covered[-1][2]]
+                ngram += [(covered[-1][0], covered[-1][1], 
+                          covered[-1][2])]
 
             transcription.append((fname, disc_on, disc_off, tuple(ngram)))
         self.transcription = transcription

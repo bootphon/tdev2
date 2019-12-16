@@ -114,8 +114,8 @@ def test_token_count_once():
     tokenType = TokenType(gold_phn, gold_wrd, disc)
 
     tokenType.compute_token_type()
-    tok_prec, typ_prec = tokenType.precision()
-    tok_rec, typ_rec = tokenType.recall()
+    tok_prec, typ_prec = tokenType.precision
+    tok_rec, typ_rec = tokenType.recall
 
     assert (tok_prec == 0.5 and tok_rec == 0.5), ("token precision should be"
            " 0.5, discovered the same token twice should be counted only once")
