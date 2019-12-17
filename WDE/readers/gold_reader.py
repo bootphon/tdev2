@@ -37,6 +37,10 @@ class Gold():
 
         # read alignments
         self.words, _, self.ix2wrd, self.wrd2ix, self.boundaries = self.read_gold_intervalTree(self.wrd_path)
+        if "SIL" in self.wrd2ix:
+            print("WARNING: Word alignement contains silences, those will be counted as word by the evaluation.\n"
+                  "You should keep them in the phone alignment but remove them from the word alignment.")
+       
         self.phones, _, self.ix2phn, self.phn2ix, _ = self.read_gold_intervalTree(self.phn_path)
         #self.boundaries = self.get_boundaries()
         
@@ -157,7 +161,13 @@ class Gold():
             ali = fin.readlines()
 
             for line in ali:
-                fname, on, off, symbol = line.strip('\n').split(' ')
+                try:
+                    fname, on, off, symbol = line.strip('\n').split(' ')
+                except:
+                    raise ValueError('format of alignement should be:\n'
+                            '\tfilename onset offset symbol\n'
+                            'but alignment contains wrongly formated line:\n'
+                            '{}'.format(line))
                 transcription[(fname, float(on), float(off))] = symbol
                 symbols.add(symbol)
                 intervals[fname].append((float(on), float(off), symbol))
@@ -173,8 +183,8 @@ class Gold():
         ix2symbols = dict((v,k) for k,v in symbol2ix.items())
 
         # Check that Silence is not present in alignments
-        if "SIL" in symbol2ix:
-            print("WARNING: Alignement contains silences, those may alter the results")
+        #if "SIL" in symbol2ix:
+        #    print("WARNING: Alignement contains silences, those may alter the results")
 
         return gold, transcription, ix2symbols, symbol2ix, boundaries
 

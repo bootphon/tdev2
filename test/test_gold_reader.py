@@ -42,7 +42,7 @@ def test_phone_read_gold(gold):
     #all_phones = [phn_ for ix, phn_ in ix2phn]
     #assert "SIL" not in all_phones,
     
-    phn_tree, trs, ix2phn_tree, phn2ix_tree = gold.read_gold_intervalTree(gold.phn_path)
+    phn_tree, trs, ix2phn_tree, phn2ix_tree, _ = gold.read_gold_intervalTree(gold.phn_path)
     #assert ix2phn_dict == ix2phn_tree, "reading as dict or tree gave different phones"
     assert len(ix2phn_tree) == len(ix2phn_dict), "reading as dict or tree gave different number of phones"
     for phn in phn2ix_dict:
@@ -57,8 +57,8 @@ def test_phone_read_gold(gold):
         assert phn_tree[fname] == copied_tree, 'interval tree for {} contains overlaps'.format(fname)
 
 def test_phone_word_read_gold(gold):
-    phn_tree, _, ix2phn_tree, phn2ix_tree = gold.read_gold_intervalTree(gold.phn_path)
-    wrd_tree, _, ix2wrd_tree, wrd2ix_tree = gold.read_gold_intervalTree(gold.wrd_path)
+    phn_tree, _, ix2phn_tree, phn2ix_tree, _ = gold.read_gold_intervalTree(gold.phn_path)
+    wrd_tree, _, ix2wrd_tree, wrd2ix_tree, _ = gold.read_gold_intervalTree(gold.wrd_path)
 
     for fname in wrd_tree:
         assert fname in phn_tree, '{} not in phone tree'.format(fname)

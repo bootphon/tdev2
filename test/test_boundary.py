@@ -33,3 +33,24 @@ def disc():
     discovered.read_clusters()
     return discovered
 
+def test_boundaries(gold):
+    """
+        Check that word boundaries are a subset of phone
+        boundaries
+    """
+    _, _, _, _, phn_boundaries = gold.read_gold_intervalTree(gold.phn_path)
+    _, _, _, _, wrd_boundaries = gold.read_gold_intervalTree(gold.wrd_path)
+
+    for fname in wrd_boundaries:
+        assert phn_boundaries[fname].intersection(wrd_boundaries[fname]) == wrd_boundaries[fname], ("boundaries"
+         "are not the same in phone alignement and word alignement")
+
+def test_bad_boundary(gold):
+    """
+        No boundary found
+    """
+    
+
+
+ 
+

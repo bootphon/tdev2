@@ -111,7 +111,6 @@ class TokenType(Measure):
                 raise ValueError('{}: file not found in gold'.format(fname))
 
             overlap_wrd = self.gold_wrd[fname].overlap(disc_on, disc_off)
-           
             ngram = tuple(phn for _, _, phn in ngram)
             # get type by getting ngram covered
             self.type_seen.add(tuple(ngram))

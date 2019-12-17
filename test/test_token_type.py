@@ -34,18 +34,18 @@ def disc():
     return discovered
 
 def test_TokenType_init(gold, disc):
-    gold_phn, _, _, _ = gold.read_gold_intervalTree(gold.phn_path)
-    gold_wrd, _, _, _ = gold.read_gold_intervalTree(gold.wrd_path)
+    gold_phn, _, _, _, _ = gold.read_gold_intervalTree(gold.phn_path)
+    gold_wrd, _, _, _, _ = gold.read_gold_intervalTree(gold.wrd_path)
     print(type(gold_phn)) 
     _init = TokenType(gold_phn, gold_wrd, disc)
 
-    assert len(_init.all_type) == 4540, "wrong number of type detected"
-    assert _init.n_token == 86065, "wrong number of token detected"
+    assert len(_init.all_type) == 4538, "wrong number of type detected"
+    assert _init.n_token == 69543, "wrong number of token detected"
 
 def test_TokenType(gold, disc):
 
-    gold_phn, _, _, _ = gold.read_gold_intervalTree(gold.phn_path)
-    gold_wrd, _, _, _ = gold.read_gold_intervalTree(gold.wrd_path)
+    gold_phn, _, _, _, _ = gold.read_gold_intervalTree(gold.phn_path)
+    gold_wrd, _, _, _, _ = gold.read_gold_intervalTree(gold.wrd_path)
     
     disc.intervals2txt(gold_phn)
     disc_int = disc.transcription
@@ -59,7 +59,7 @@ def test_TokenType(gold, disc):
     #type_covered 11117
     #n_type 4540
 
-    assert len(tokenType.type_seen) == 14109, "should cover 14109 types, found {}".format(len(tokenType.type_seen))
+    assert len(tokenType.type_seen) == 14111, "should cover 14109 types, found {}".format(len(tokenType.type_seen))
     assert len(tokenType.type_hit) == 740, "should have hit 740 types, found {}".format(len(tokenType.type_hit))
     
 
@@ -75,7 +75,7 @@ def test_unknown_filename():
     gold_phn = {'s01': intervaltree.IntervalTree.from_tuples(gold_phn_intervals)}
 
     # test that only one discovered token is counted, not two
-    disc = [('s06', 1.0, 1.69, ('tambour',))]
+    disc = [('s06', 1.0, 1.69, ((1.0, 2.0,'tambour'),))]
 
     with pytest.raises(ValueError) as err:
         tokenType = TokenType(gold_phn, gold_wrd, disc)
@@ -109,7 +109,7 @@ def test_token_count_once():
     gold_phn = {'s01': intervaltree.IntervalTree.from_tuples(gold_phn_intervals)}
 
     # test that only one discovered token is counted, not two
-    disc = [('s01', 1.0, 1.69, ('tambour',)), ('s01', 1.02, 1.69, ('tambour',))]
+    disc = [('s01', 1.0, 1.69, ((1.0, 2.0,'tambour'),)), ('s01', 1.02, 1.69, ((1.0, 2.0,'tambour'),))]
 
     tokenType = TokenType(gold_phn, gold_wrd, disc)
 
