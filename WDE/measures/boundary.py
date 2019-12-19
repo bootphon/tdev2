@@ -89,10 +89,10 @@ class Boundary(Measure):
             if fname not in self.gold_boundaries_up:
                 raise ValueError('{}: file not found in gold'.format(fname))
 
-            if disc_time in self.gold_boundaries_up[fname]:
+            if (disc_time in self.gold_boundaries_up[fname]
+                and not (fname, disc_time) in self.boundaries_seen):
                 self.n_discovered_boundary += 1
-
-
+                self.boundaries_seen.add((fname, disc_time))
 
     def compute_boundary_score(self):
         """Count how many unique boundaries were discovered"""
