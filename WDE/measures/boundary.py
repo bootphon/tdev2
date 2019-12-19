@@ -30,7 +30,7 @@ class Boundary(Measure):
 
         # measures
         self.boundaries = dict()
-        self.boundaries_seen = defaultdict(set)
+        self.boundaries_seen = set()
         self.n_correct_disc_boundary = 0
         self.n_all_disc_boundary = len(self.disc_up) + len(self.disc_down)
         self.n_gold_boundary = 0

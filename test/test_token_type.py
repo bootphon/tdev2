@@ -33,6 +33,17 @@ def disc():
     discovered.read_clusters()
     return discovered
 
+@pytest.fixture(scope='session')
+def disc_goldIntervals(gold):
+    pairs_path = pkg_resources.resource_filename(
+            pkg_resources.Requirement.parse('WDE'),
+            'WDE/share/gold.class')
+    discovered = Disc(pairs_path)
+    #discovered.read_clusters()
+    discovered.intervals2txt(gold.phones)
+    return discovered
+
+
 def test_TokenType_init(gold, disc):
     gold_phn, _, _, _, _ = gold.read_gold_intervalTree(gold.phn_path)
     gold_wrd, _, _, _, _ = gold.read_gold_intervalTree(gold.wrd_path)
@@ -121,3 +132,16 @@ def test_token_count_once():
            " 0.5, discovered the same token twice should be counted only once")
     assert (typ_prec == 1.0 and typ_rec == 0.5), ("type precision should be"
            " 1.0, and type recall 0.5, as all covered types were discovered")
+
+def test_gold_intervals(gold, disc_goldIntervals):
+    tokenType = TokenType(gold.phones, gold.words, disc_goldIntervals)
+    tokenType.compute_token_type()
+
+    tok_prec, typ_prec = tokenType.precision
+    tok_rec, typ_rec = tokenType.recall
+
+    assert (tok_prec == 1.0 and tok_rec == 1.0), ("token precision should be"
+           " 1.0, discovered the same token twice should be counted only once")
+    assert (typ_prec == 1.0 and typ_rec == 1.0), ("type precision should be"
+           " 1.0, and type recall 1.0, as all covered types were discovered")
+

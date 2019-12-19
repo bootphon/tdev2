@@ -122,6 +122,7 @@ class TokenType(Measure):
             # onset and offset are less than 30ms or 50% away
             # from border phone boundaries, then don't count
             if len(overlap_wrd) < 1:
+                ipdb.set_trace()
                 continue
             elif len(overlap_wrd) > 1:
                 # choose word with the most overlap
@@ -154,4 +155,15 @@ class TokenType(Measure):
             if ((gold_wrd_trs == ngram) and 
                 not ngram in self.type_hit):
                 self.type_hit.add(ngram)
+            elif ((gold_wrd_trs != ngram) and 
+                not ngram in self.type_hit):
+                ipdb.set_trace()
+            elif ((gold_wrd_trs != ngram) and 
+                 ngram in self.type_hit):
+                ipdb.set_trace()
+            else:
+                continue
+           
+            #else:
+            #    ipdb.set_trace()
 
