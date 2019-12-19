@@ -4,33 +4,40 @@ import ipdb
 import numpy as np
 
 from .measures import Measure
+from collections import defaultdict
 from WDE.utils import overlap, check_boundary
 
 class Boundary(Measure):
     def __init__(self, gold, disc):
         self.metric_name = "boundary"
         # get gold as interval trees
-        self.gold_boundaries = gold.boundaries
+        #self.gold_boundaries = gold.boundaries
+        self.gold_boundaries_up = gold.boundaries[0]
+        self.gold_boundaries_down = gold.boundaries[1]
         self.gold_wrd = gold.words
         assert type(self.gold_wrd) == dict, ("gold_phn should be a dict "
            "of intervaltree objects but is {} ".format(type(gold_wrd)))
 
         # get all discovered boundaries
-        bounds = [(fname, ngram[0][0]) 
+        bounds_down = [(fname, ngram[0][0]) 
                 for fname, _, _, ngram in disc.transcription]
-        bounds += [(fname, ngram[-1][1]) 
+        bounds_up = [(fname, ngram[-1][1]) 
                 for fname, _, _, ngram in disc.transcription]
-        self.disc = set(bounds)
-
+        self.disc_down = set(bounds_down)
+        self.disc_up = set(bounds_up).difference(
+                set(bounds_up).intersection(self.disc_down))
+        
 
         # measures
         self.boundaries = dict()
+        self.boundaries_seen = defaultdict(set)
         self.n_correct_disc_boundary = 0
-        self.n_all_disc_boundary = len(self.disc)
+        self.n_all_disc_boundary = len(self.disc_up) + len(self.disc_down)
         self.n_gold_boundary = 0
         self.n_discovered_boundary = 0
-        for fname in self.gold_boundaries:
-            self.n_gold_boundary += len(self.gold_boundaries[fname])
+        for fname in self.gold_boundaries_up:
+            self.n_gold_boundary += len(self.gold_boundaries_up[fname])
+            self.n_gold_boundary += len(self.gold_boundaries_down[fname])
             #self.n_all_disc_boundary += 2 * len(self.disc)
 
 
@@ -69,15 +76,21 @@ class Boundary(Measure):
 
     def compute_boundary(self):
         """Create intervaltree containing only boundary phones"""
-        for fname, disc_time in self.disc:
-            if fname not in self.gold_boundaries:
+        for fname, disc_time in self.disc_down:
+            if fname not in self.gold_boundaries_down:
                 raise ValueError('{}: file not found in gold'.format(fname))
 
-            if disc_time in self.gold_boundaries[fname]:
+            if disc_time in self.gold_boundaries_down[fname]:
                 self.n_discovered_boundary += 1
             #if (len(ngram) > 1 
             #and (ngram[-1][1], ngram[-1][2]) in self.gold_boundaries[fname]):
             #    self.n_discovered_boundary += 1
+        for fname, disc_time in self.disc_up:
+            if fname not in self.gold_boundaries_up:
+                raise ValueError('{}: file not found in gold'.format(fname))
+
+            if disc_time in self.gold_boundaries_up[fname]:
+                self.n_discovered_boundary += 1
 
 
 

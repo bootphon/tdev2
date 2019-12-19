@@ -156,7 +156,9 @@ class Gold():
         gold = dict()
         symbols = set() # create a set of all the available symbols
         transcription = dict() # create dict that returns the transcription for an interval
-        boundaries = defaultdict(set)
+        boundaries_up = defaultdict(set)
+        boundaries_down = defaultdict(set)
+
         with open(gold_path, 'r') as fin:
             ali = fin.readlines()
 
@@ -171,22 +173,26 @@ class Gold():
                 transcription[(fname, float(on), float(off))] = symbol
                 symbols.add(symbol)
                 intervals[fname].append((float(on), float(off), symbol))
-                boundaries[fname].add(float(on))
-                boundaries[fname].add(float(off))
+                boundaries_up[fname].add(float(off))
+                boundaries_down[fname].add(float(on))
 
             # for each filename, create an interval tree
             for fname in intervals:
                 gold[fname] = intervaltree.IntervalTree.from_tuples(intervals[fname])
 
-            # create a mapping index -> symbols for the phones
+        # create a mapping index -> symbols for the phones
         symbol2ix = {v: k for k, v in enumerate(list(symbols))}
         ix2symbols = dict((v,k) for k,v in symbol2ix.items())
 
-        # Check that Silence is not present in alignments
-        #if "SIL" in symbol2ix:
-        #    print("WARNING: Alignement contains silences, those may alter the results")
+        # boundaries_down: contains all down boundaries, 
+        # boundaries_up: contains all up boundaries that do not already
+        # occur un boundaries_down
+        for fname in boundaries_up:
+            boundaries_up[fname] = boundaries_up[fname].difference(
+                    boundaries_up[fname].intersection(boundaries_down[fname]))
 
-        return gold, transcription, ix2symbols, symbol2ix, boundaries
+        return (gold, transcription, ix2symbols,
+                symbol2ix, (boundaries_up, boundaries_down))
 
     def get_intervals(fname, on, off, gold, transcription):
         """ Given a filename and an interval, retrieve the list of 
