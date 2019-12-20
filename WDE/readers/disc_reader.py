@@ -118,32 +118,37 @@ class Disc():
         """
 
         ngram = []
-        transcription = []
+        intervals_transcription = []
         #ipdb.set_trace()
-        for fname, disc_on, disc_off in self.intervals:
+        #for fname, disc_on, disc_off in self.intervals:
+        for class_nb in self.clusters:
+            class_trs = []
+            for fname, disc_on, disc_off in self.clusters[class_nb]:
 
-            # Get all covered phones
-            covered = sorted([phn  for phn 
-                                  in gold_phn[fname].overlap(disc_on, disc_off)],
-                                  key=lambda times: times[0])
-            # Check if first and last phones are discovered
-            keep_first = check_boundary((covered[0][0], covered[0][1]),
-                                      (disc_on, covered[0][1]))
-            keep_last = check_boundary((covered[-1][0], covered[-1][1]),
-                                      (covered[-1][0], disc_off))
+                # Get all covered phones
+                covered = sorted([phn  for phn 
+                                      in gold_phn[fname].overlap(disc_on, disc_off)],
+                                      key=lambda times: times[0])
+                # Check if first and last phones are discovered
+                keep_first = check_boundary((covered[0][0], covered[0][1]),
+                                          (disc_on, covered[0][1]))
+                keep_last = check_boundary((covered[-1][0], covered[-1][1]),
+                                          (covered[-1][0], disc_off))
 
-            if keep_first:
-                ngram = [(covered[0][0], covered[0][1],
-                          covered[0][2])]
-            else:
-                ngram = []
+                if keep_first:
+                    ngram = [(covered[0][0], covered[0][1],
+                              covered[0][2])]
+                else:
+                    ngram = []
 
-            ngram += [ (on, off, phn) for on, off, phn in covered[1:-1]]
+                ngram += [ (on, off, phn) for on, off, phn in covered[1:-1]]
 
-            if keep_last and len(covered) > 1:
-                ngram += [(covered[-1][0], covered[-1][1], 
-                          covered[-1][2])]
+                if keep_last and len(covered) > 1:
+                    ngram += [(covered[-1][0], covered[-1][1], 
+                              covered[-1][2])]
 
-            transcription.append((fname, disc_on, disc_off, tuple(ngram)))
-        self.transcription = transcription
+                intervals_transcription.append((fname, disc_on, disc_off, tuple(ngram)))
+                class_trs.append((fname, disc_on, disc_off, tuple(ngram)))
+            self.clusters[class_nb] = class_trs
+        self.transcription = intervals_transcription
 
