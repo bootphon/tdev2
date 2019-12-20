@@ -152,18 +152,8 @@ class TokenType(Measure):
                 self.token_seen.add((fname, gold_wrd_on, 
                       gold_wrd_off, gold_wrd_token))
 
+            ## TODO CHECK HOMOPHONE CASE W/ EMMANUEL
             if ((gold_wrd_trs == ngram) and 
                 not ngram in self.type_hit):
                 self.type_hit.add(ngram)
-            elif ((gold_wrd_trs != ngram) and 
-                not ngram in self.type_hit):
-                ipdb.set_trace()
-            elif ((gold_wrd_trs != ngram) and 
-                 ngram in self.type_hit):
-                ipdb.set_trace()
-            else:
-                continue
-           
-            #else:
-            #    ipdb.set_trace()
 

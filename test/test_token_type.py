@@ -134,7 +134,7 @@ def test_token_count_once():
            " 1.0, and type recall 0.5, as all covered types were discovered")
 
 def test_gold_intervals(gold, disc_goldIntervals):
-    tokenType = TokenType(gold.phones, gold.words, disc_goldIntervals)
+    tokenType = TokenType(gold.phones, gold.words, disc_goldIntervals.transcription)
     tokenType.compute_token_type()
 
     tok_prec, typ_prec = tokenType.precision
@@ -142,6 +142,7 @@ def test_gold_intervals(gold, disc_goldIntervals):
 
     assert (tok_prec == 1.0 and tok_rec == 1.0), ("token precision should be"
            " 1.0, discovered the same token twice should be counted only once")
-    assert (typ_prec == 1.0 and typ_rec == 1.0), ("type precision should be"
-           " 1.0, and type recall 1.0, as all covered types were discovered")
+    assert (typ_prec == 1.0 and typ_rec == 0.9858968708682239), ("type precision should be"
+           " 1.0, and type recall ~0.98 (because of homophones),"
+           "as all covered types were discovered")
 
