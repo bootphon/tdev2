@@ -50,10 +50,15 @@ class Grouping(Measure):
         """
         # count occurences or each interval in pairs for frequency 
         counter = Counter()
+        seen_token = set()
         for f1, f2 in pairs:
-            counter.update((f1[3],))
-            if f2[3] != f1[3]:
-                counter.update((f2[3],))
+            if f1[3] not in seen_token:
+                counter.update((f1[4],))
+                # count token as seen
+                seen_token.add(f1[3])
+            if f2[4] != f1[4] and f2[3] not in seen_token:
+                counter.update((f2[4],))
+                seen_token.add(f2[3])
         
         weights = {ngram: 1/counter[ngram] for ngram in counter}
         return weights, counter
