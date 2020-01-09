@@ -28,14 +28,14 @@ class Grouping(Measure):
              
         # add gold pair if both elements don't overlap
         self.gold_pairs = { tuple(sorted((f1, f2), key = lambda f: (f[0], f[1]))) for ngram in same for f1, f2 in combinations(same[ngram], 2) if not (f1[0] == f2[0] and overlap((f1[1], f1[2]), (f2[1], f2[2]))[0] > 0)}
-        self.gold_types = {f1[3] for f1, f2 in self.gold_pairs}
+        self.gold_types = {f1[4] for f1, f2 in self.gold_pairs}
 
     def get_found_pairs(self):
         """ get all the pairs that were found """
         
         for class_nb in self.clusters:
             self.found_pairs = self.found_pairs.union(combinations(self.clusters[class_nb],2))
-            self.found_types = self.found_types.union({token_ngram for _,_,_,token_ngram,ngram in self.clusters[class_nb]})
+            self.found_types = self.found_types.union({ngram for _,_,_,token_ngram,ngram in self.clusters[class_nb]})
         # order found pairs
         self.found_pairs = {tuple(sorted((f1, f2), key = lambda f: (f[0], f[1]))) for f1, f2 in self.found_pairs}
         
@@ -60,7 +60,8 @@ class Grouping(Measure):
                 counter.update((f2[4],))
                 seen_token.add(f2[3])
         
-        weights = {ngram: 1/counter[ngram] for ngram in counter}
+        #weights = {ngram: 1/counter[ngram] for ngram in counter}
+        weights = {ngram: counter[ngram]/len(seen_token) for ngram in counter}
         return weights, counter
 
     def compute_grouping(self):
