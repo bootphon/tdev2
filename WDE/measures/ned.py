@@ -31,9 +31,9 @@ class ned(Measure):
         overall_ned = []
 
         for class_nb in self.disc:
-            for discovered1, discovered2 in combinations(range(len(self.disc[class_nb])), 2):
-                fname1, disc_on1, disc_off1, ngram1 = self.disc[class_nb][discovered1]
-                fname2, disc_on2, disc_off2, ngram2 =  self.disc[class_nb][discovered2]
+            for discovered1, discovered2 in combinations(self.disc[class_nb], 2):
+                fname1, disc_on1, disc_off1, token_ngram1, ngram1 = discovered1
+                fname2, disc_on2, disc_off2, token_ngram2, ngram2 = discovered2
                 
                 pair_ned = self.pairwise_ned(ngram1, ngram2)
                 overall_ned.append(pair_ned)

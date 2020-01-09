@@ -117,6 +117,7 @@ class Disc():
             and phonetically transcribe the intervals to phones.
         """
 
+        token_ngram = []
         ngram = []
         intervals_transcription = []
         #ipdb.set_trace()
@@ -136,19 +137,22 @@ class Disc():
                                           (covered[-1][0], disc_off))
 
                 if keep_first:
-                    ngram = [(covered[0][0], covered[0][1],
+                    token_ngram = [(covered[0][0], covered[0][1],
                               covered[0][2])]
+                    ngram = [covered[0][2]]
                 else:
+                    token_ngram = []
                     ngram = []
 
-                ngram += [ (on, off, phn) for on, off, phn in covered[1:-1]]
+                token_ngram += [ (on, off, phn) for on, off, phn in covered[1:-1]]
+                ngram += [phn for on, off, phn in covered[1:-1]]
 
                 if keep_last and len(covered) > 1:
-                    ngram += [(covered[-1][0], covered[-1][1], 
+                    token_ngram += [(covered[-1][0], covered[-1][1], 
                               covered[-1][2])]
-
-                intervals_transcription.append((fname, disc_on, disc_off, tuple(ngram)))
-                class_trs.append((fname, disc_on, disc_off, tuple(ngram)))
+                    ngram += [covered[-1][2]]
+                intervals_transcription.append((fname, disc_on, disc_off, tuple(token_ngram), tuple(ngram)))
+                class_trs.append((fname, disc_on, disc_off, tuple(token_ngram), tuple(ngram)))
             self.clusters[class_nb] = class_trs
         self.transcription = intervals_transcription
 

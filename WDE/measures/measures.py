@@ -4,8 +4,6 @@
    It also contains functions to pretty print, write into files...
 """
 
-
-
 class Measure():
     def __init__():
         pass
