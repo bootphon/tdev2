@@ -2,12 +2,4 @@
 
 - Simplify/optimize transcription for clusters
 
-- test for NED
-
-- implement coverage 
-
-- implement grouping
-
-- remove SILs' for coverage
-
-- add grouping
+- CHECK DIFFERENCE MOT/NGRAM 200/500ms 

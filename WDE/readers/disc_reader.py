@@ -98,8 +98,8 @@ class Disc():
                     # re-initialize classes
                     classes = list()
                 else:
-                    logging.error("Line in discovered classes has wrong format")
-                    logging.error("{}".format(line))
+                    print("Line in discovered classes has wrong format")
+                    print("{}".format(line))
 
         self.clusters = discovered
         self.intervals = list(intervals)

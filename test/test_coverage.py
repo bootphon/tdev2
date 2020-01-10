@@ -38,8 +38,8 @@ def gold_disc(gold):
 def test_gold_coverage(gold, gold_disc):
     cov = Coverage(gold, gold_disc)
 
-    res = cov.compute_cov()
-    print(res)
+    cov.compute_cov()
+    print(cov.coverage)
 
-    assert res == 1, "gold should have 100% coverage"
+    assert cov.coverage == 1, "gold should have 100% coverage"
     

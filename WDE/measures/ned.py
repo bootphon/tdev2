@@ -1,19 +1,8 @@
-
-
-
-
-
-
 import numpy as np
 import editdistance 
 
 from .measures import Measure
 from itertools import combinations
-
-
-
-
-
 
 class ned(Measure):
     def __init__(self, disc):
@@ -28,6 +17,16 @@ class ned(Measure):
         return float(editdistance.eval(s1, s2)) / max(len(s1), len(s2))
 
     def compute_ned(self):
+        """ compute edit distance over all discovered pairs and average across
+            all pairs
+
+            Input:
+            :param disc:  a dictionnary containing all the discovered clusters.
+                          Each key in the dict is a class, and its value is 
+                          all the intervals in this cluster.
+            Output:
+            :param ned:   the average edit distance of all the pairs
+        """
         overall_ned = []
 
         for class_nb in self.disc:

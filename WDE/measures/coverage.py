@@ -10,15 +10,18 @@ class Coverage(Measure):
         for fname in gold.phones:
             ## TODO remove SIL here ? 
             self.n_phones += len([ph for on, off, ph in gold.phones[fname] if (ph != "SIL" and ph != "SPN")])
-            # self.n_phones += len(gold.phones[fname])
-            #self.all_intervals = self.all_intervals.union(set((fname, on, off) for on, off, phn inf gold.phones[fname]))
 
         self.covered_phn = set((fname, phn_on, phn_off) for fname, disc_on, disc_off, token_ngram, ngram in disc.transcription for phn_on, phn_off, phn in token_ngram )
         self.coverage = 0
         
     def compute_cov(self):
-        #for fname, phn_on, phn_off in self.covered_phn:
-        #    if (fname, phn_on, phn_off) in self.all_intervals:
-        #        self.all_intervals.remove((fname, phn_on, phn_off))
+        """ For coverage, simply compute the ratio of discovered phones over all phone
+            
+            Input:
+            :param covered_phn:  a set containing all the covered phones
+
+            Output:
+            :param coverage:     the ratio of number of covered phones over 
+                                 the overall number of phones in the corpus
+        """
         self.coverage = len(self.covered_phn) / self.n_phones
-        return self.coverage

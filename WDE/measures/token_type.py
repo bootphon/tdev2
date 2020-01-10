@@ -11,6 +11,7 @@ class TokenType(Measure):
         self.metric_name = "token type"
         # get gold as interval trees
         self.gold_phn = gold_phn
+
         assert type(gold_phn) == dict, ("gold_phn should be a dict "
            "of intervaltree objects but is {} ".format(type(gold_phn)))
         self.gold_wrd = gold_wrd
@@ -18,6 +19,8 @@ class TokenType(Measure):
            "of intervaltree objects but is {} ".format(type(gold_wrd)))
         self.all_type = set()
         self.n_token = 0
+
+        # get gold types and count gold tokens
         for fname in self.gold_wrd:
             self.all_type.update(set([word for on, off, word 
                                    in self.gold_wrd[fname]]))
