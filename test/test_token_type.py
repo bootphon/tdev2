@@ -59,8 +59,8 @@ def test_TokenType(gold, disc):
     gold_wrd, _, _, _, _ = gold.read_gold_intervalTree(gold.wrd_path)
     
     disc.intervals2txt(gold_phn)
-    disc_int = disc.transcription
-    tokenType = TokenType(gold_phn, gold_wrd, disc_int)
+    #disc_int = disc.transcription
+    tokenType = TokenType(gold_phn, gold_wrd, disc)
     tokenType.compute_token_type()
 
     #token_hit 6924
@@ -78,7 +78,7 @@ def test_TokenType(gold, disc):
 def test_bad_tokens(gold):
     pass
 
-def test_unknown_filename():
+def test_unknown_filename(disc):
     gold_wrd_intervals = [(1.0, 2.0, 'tambour'), (3.0, 4.0 , 'cassoulet')]
     gold_phn_intervals = gold_wrd_intervals 
     
@@ -86,33 +86,15 @@ def test_unknown_filename():
     gold_phn = {'s01': intervaltree.IntervalTree.from_tuples(gold_phn_intervals)}
 
     # test that only one discovered token is counted, not two
-    disc = [('s06', 1.0, 1.69, ((1.0, 2.0,'tambour'),))]
+    disc.transcription = [('s06', 1.0, 1.69, ((1.0, 2.0,'tambour'),), 
+                          ('tambour',))]
 
     with pytest.raises(ValueError) as err:
         tokenType = TokenType(gold_phn, gold_wrd, disc)
         tok_prec, tok_rec, typ_prec, typ_rec = tokenType.compute_token_type()
     assert 'file not found' in str(err.value)
 
-def test_outside_boundaries():
-    pass
-
-def test_check_word(gold):
-    #TODO: cas :
-    # mot bien découvert, 
-    # disc trop petit (ric-rac),
-    # disc trop grand mais bien
-    # disc trop grand mais plusieurs phon d'un côté
-    # disc trop grand mais plusieurs phon de l'autre
-    disc1 = [('s0101a', 51.828, 52.473)]
-    disc2 = [('s2001b', 54.5, 54.7)]
-    disc3 = [('s2301b', 36.95, 37.468)]
-    disc4 = [('s2301b', 297.911, 298.450)]
-    pass
-
-def test_gold_with_jitter():
-    pass
-
-def test_token_count_once():
+def test_token_count_once(disc):
     gold_wrd_intervals = [(1.0, 2.0, 'tambour'), (3.0, 4.0 , 'cassoulet')]
     gold_phn_intervals = gold_wrd_intervals 
     
@@ -120,7 +102,8 @@ def test_token_count_once():
     gold_phn = {'s01': intervaltree.IntervalTree.from_tuples(gold_phn_intervals)}
 
     # test that only one discovered token is counted, not two
-    disc = [('s01', 1.0, 1.69, ((1.0, 2.0,'tambour'),)), ('s01', 1.02, 1.69, ((1.0, 2.0,'tambour'),))]
+    disc.transcription = [('s01', 1.0, 1.69, ((1.0, 2.0,'tambour'),),
+                          ('tambour',)), ('s01', 1.02, 1.69, ((1.0, 2.0,'tambour'),), ('tambour',))]
 
     tokenType = TokenType(gold_phn, gold_wrd, disc)
 
@@ -134,7 +117,7 @@ def test_token_count_once():
            " 1.0, and type recall 0.5, as all covered types were discovered")
 
 def test_gold_intervals(gold, disc_goldIntervals):
-    tokenType = TokenType(gold.phones, gold.words, disc_goldIntervals.transcription)
+    tokenType = TokenType(gold.phones, gold.words, disc_goldIntervals)
     tokenType.compute_token_type()
 
     tok_prec, typ_prec = tokenType.precision

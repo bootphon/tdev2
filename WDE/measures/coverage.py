@@ -13,7 +13,7 @@ class Coverage(Measure):
             # self.n_phones += len(gold.phones[fname])
             #self.all_intervals = self.all_intervals.union(set((fname, on, off) for on, off, phn inf gold.phones[fname]))
 
-        self.covered_phn = set((fname, phn_on, phn_off) for fname, disc_on, disc_off, ngram in disc.transcription for phn_on, phn_off, phn in ngram )
+        self.covered_phn = set((fname, phn_on, phn_off) for fname, disc_on, disc_off, token_ngram, ngram in disc.transcription for phn_on, phn_off, phn in ngram )
         self.coverage = 0
         
     def compute_cov(self):

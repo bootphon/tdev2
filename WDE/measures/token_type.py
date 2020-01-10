@@ -25,7 +25,7 @@ class TokenType(Measure):
         self.n_type = len(self.all_type)
 
         # get discovered as list of intervals
-        self.disc = disc
+        self.disc = disc.transcription
 
         # measures
         self.n_discovered_words = 0
