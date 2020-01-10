@@ -45,7 +45,8 @@ class Grouping(Measure):
 
     #    pass
 
-    def get_weights(self, pairs):
+    @staticmethod
+    def get_weights(pairs):
         """ for each type get its weight
         """
         # count occurences or each interval in pairs for frequency 
@@ -56,10 +57,10 @@ class Grouping(Measure):
                 counter.update((f1[4],))
                 # count token as seen
                 seen_token.add(f1[3])
-            if f2[4] != f1[4] and f2[3] not in seen_token:
+            if f2[3] not in seen_token:
                 counter.update((f2[4],))
                 seen_token.add(f2[3])
-        
+        print(seen_token) 
         #weights = {ngram: 1/counter[ngram] for ngram in counter}
         weights = {ngram: counter[ngram]/len(seen_token) for ngram in counter}
         return weights, counter
@@ -73,7 +74,7 @@ class Grouping(Measure):
         self.found_weights, self.found_counter = self.get_weights(self.found_pairs)
         _, self.found_gold_counter = self.get_weights(gold_found_pairs)
 
-
+    @property
     def precision(self):
         if len(self.found_types) == 0:
             prec = np.nan
@@ -81,6 +82,7 @@ class Grouping(Measure):
             prec = sum(self.found_weights[t] * self.found_gold_counter[t] / self.found_counter[t] for t in self.found_types)
         return prec
 
+    @property
     def recall(self):
         if len(self.gold_types) == 0:
             rec = np.nan
