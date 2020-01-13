@@ -36,14 +36,15 @@ from collections import defaultdict
 from WDE.utils import overlap, check_boundary
 
 class Disc():
-    def __init__(self, disc_path=None):
+    def __init__(self, disc_path=None, gold=None):
 
         if not os.path.isfile(disc_path):
             raise ValueError('{}: File Not Found'.format(disc_path))
         self.disc_path = disc_path
         self.clusters = None
         self.intervals = None
-        self.transcription = None
+        self.gold_phn = gold.phones
+        #self.transcription = None
         self.intervals_tree = None
         # set intervals
         self.read_clusters()
@@ -53,18 +54,19 @@ class Disc():
            '{} {} {}'.format(fname, t0, t1)
            for (fname, t0, t1) in self.intervals)
     
-    def get_interval_transcription(self, fname, on, off):
-        """ Return the transcription of an interval """
+    #def get_interval_transcription(self, fname, on, off):
+    #    """ Return the transcription of an interval """
 
-        if not self.transcription:
-            raise AttributeError('Must call interval2txt first to'
-                                 ' compute transcription for all intervals')
-        if (fname, on, off) not in self.intervals:
-            raise ValueError('Requested interval not in discovered intervals')
+    #    #if (fname, on, off) not in self.intervals:
+    #    #    raise ValueError('Requested interval not in discovered intervals')
+    #    interval_trs = [ngram for fn, disc_on, disc_on, token_ngram, ngram
+    #                          in self.intervals
+    #                          if (fn == fname and disc_on == on
+    #                              and disc_off == off)]
+    #    if len(interval_trs) == 0:
+    #        raise ValueError('Requested interval not in discovered intervals')
 
-        interval_idx = self.intervals.index((fname, on, off))
-        
-        return ' '.join(self.transcription[interval_idx][3])
+    #    return ' '.join(interval_trs)
 
     def read_clusters(self):
         """ Read discovered clusters """
@@ -86,8 +88,14 @@ class Disc():
                     pass
                 elif len(line.split(' ')) == 3:
                     fname, start, end = line.split(' ')
-                    intervals.add((fname, float(start), float(end)))
-                    classes.append([fname, float(start), float(end)])
+                    disc_on, disc_off = float(start), float(end)
+
+                    # get the phone transcription for current interval
+                    token_ngram, ngram = self.get_transcription(fname, disc_on,
+                                            disc_off, self.gold_phn)
+
+                    intervals.add((fname, disc_on, disc_off, token_ngram, ngram))
+                    classes.append([fname, disc_on, disc_off, token_ngram, ngram])
                 elif len(line) == 0:
                     # empty line means that the class has ended 
                     # add class to discovered dict.
@@ -112,47 +120,79 @@ class Disc():
         for fname in self.intervals:
             self.intervals_tree[fname] = intervaltree.IntervalTree.from_tuples(self.intervals[fname])
 
-    def intervals2txt(self, gold_phn):
-        """ For each interval, check which gold phones are covered
-            and phonetically transcribe the intervals to phones.
-        """
+    @staticmethod
+    def get_transcription(fname, disc_on, disc_off, gold_phn):
+        """ Given an interval, get its phone transcription"""
 
-        token_ngram = []
-        ngram = []
-        intervals_transcription = []
-        #ipdb.set_trace()
-        #for fname, disc_on, disc_off in self.intervals:
-        for class_nb in self.clusters:
-            class_trs = []
-            for fname, disc_on, disc_off in self.clusters[class_nb]:
+        # Get all covered phones
+        covered = sorted([phn  for phn 
+                              in gold_phn[fname].overlap(disc_on, disc_off)],
+                              key=lambda times: times[0])
+        # Check if first and last phones are discovered
+        keep_first = check_boundary((covered[0][0], covered[0][1]),
+                                  (disc_on, covered[0][1]))
+        keep_last = check_boundary((covered[-1][0], covered[-1][1]),
+                                  (covered[-1][0], disc_off))
 
-                # Get all covered phones
-                covered = sorted([phn  for phn 
-                                      in gold_phn[fname].overlap(disc_on, disc_off)],
-                                      key=lambda times: times[0])
-                # Check if first and last phones are discovered
-                keep_first = check_boundary((covered[0][0], covered[0][1]),
-                                          (disc_on, covered[0][1]))
-                keep_last = check_boundary((covered[-1][0], covered[-1][1]),
-                                          (covered[-1][0], disc_off))
+        if keep_first:
+            token_ngram = [(covered[0][0], covered[0][1],
+                      covered[0][2])]
+            ngram = [covered[0][2]]
+        else:
+            token_ngram = []
+            ngram = []
 
-                if keep_first:
-                    token_ngram = [(covered[0][0], covered[0][1],
-                              covered[0][2])]
-                    ngram = [covered[0][2]]
-                else:
-                    token_ngram = []
-                    ngram = []
+        token_ngram += [ (on, off, phn) for on, off, phn in covered[1:-1]]
+        ngram += [phn for on, off, phn in covered[1:-1]]
 
-                token_ngram += [ (on, off, phn) for on, off, phn in covered[1:-1]]
-                ngram += [phn for on, off, phn in covered[1:-1]]
+        if keep_last and len(covered) > 1:
+            token_ngram += [(covered[-1][0], covered[-1][1], 
+                      covered[-1][2])]
+            ngram += [covered[-1][2]]
 
-                if keep_last and len(covered) > 1:
-                    token_ngram += [(covered[-1][0], covered[-1][1], 
-                              covered[-1][2])]
-                    ngram += [covered[-1][2]]
-                intervals_transcription.append((fname, disc_on, disc_off, tuple(token_ngram), tuple(ngram)))
-                class_trs.append((fname, disc_on, disc_off, tuple(token_ngram), tuple(ngram)))
-            self.clusters[class_nb] = class_trs
-        self.transcription = intervals_transcription
+        return tuple(token_ngram), tuple(ngram)
+
+    #def intervals2txt(self, gold_phn):
+    #    """ For each interval, check which gold phones are covered
+    #        and phonetically transcribe the intervals to phones.
+    #    """
+
+    #    token_ngram = []
+    #    ngram = []
+    #    intervals_transcription = []
+    #    #ipdb.set_trace()
+    #    #for fname, disc_on, disc_off in self.intervals:
+    #    for class_nb in self.clusters:
+    #        class_trs = []
+    #        for fname, disc_on, disc_off in self.clusters[class_nb]:
+
+    #            # Get all covered phones
+    #            covered = sorted([phn  for phn 
+    #                                  in gold_phn[fname].overlap(disc_on, disc_off)],
+    #                                  key=lambda times: times[0])
+    #            # Check if first and last phones are discovered
+    #            keep_first = check_boundary((covered[0][0], covered[0][1]),
+    #                                      (disc_on, covered[0][1]))
+    #            keep_last = check_boundary((covered[-1][0], covered[-1][1]),
+    #                                      (covered[-1][0], disc_off))
+
+    #            if keep_first:
+    #                token_ngram = [(covered[0][0], covered[0][1],
+    #                          covered[0][2])]
+    #                ngram = [covered[0][2]]
+    #            else:
+    #                token_ngram = []
+    #                ngram = []
+
+    #            token_ngram += [ (on, off, phn) for on, off, phn in covered[1:-1]]
+    #            ngram += [phn for on, off, phn in covered[1:-1]]
+
+    #            if keep_last and len(covered) > 1:
+    #                token_ngram += [(covered[-1][0], covered[-1][1], 
+    #                          covered[-1][2])]
+    #                ngram += [covered[-1][2]]
+    #            intervals_transcription.append((fname, disc_on, disc_off, tuple(token_ngram), tuple(ngram)))
+    #            class_trs.append((fname, disc_on, disc_off, tuple(token_ngram), tuple(ngram)))
+    #        self.clusters[class_nb] = class_trs
+    #    self.transcription = intervals_transcription
 

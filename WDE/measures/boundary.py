@@ -19,9 +19,9 @@ class Boundary(Measure):
 
         # get all discovered boundaries
         bounds_down = [(fname, ngram[0][0]) 
-                for fname, _, _, ngram,_ in disc.transcription]
+                for fname, _, _, ngram,_ in disc.intervals]
         bounds_up = [(fname, ngram[-1][1]) 
-                for fname, _, _, ngram,_ in disc.transcription]
+                for fname, _, _, ngram,_ in disc.intervals]
         self.disc_down = set(bounds_down)
         self.disc_up = set(bounds_up).difference(
                 set(bounds_up).intersection(self.disc_down))

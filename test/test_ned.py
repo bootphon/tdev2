@@ -30,9 +30,9 @@ def gold_disc(gold):
     pairs_path = pkg_resources.resource_filename(
             pkg_resources.Requirement.parse('WDE'),
             'WDE/share/gold_pairs.class')
-    discovered = Disc(pairs_path)
+    discovered = Disc(pairs_path, gold)
     #discovered.read_clusters()
-    discovered.intervals2txt(gold.phones)
+    #discovered.intervals2txt(gold.phones)
     return discovered
 
 def test_gold_pairs(gold, gold_disc):

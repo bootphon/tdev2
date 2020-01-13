@@ -12,7 +12,7 @@ class Grouping(Measure):
     def __init__(self, gold, disc):
         self.metric_name = "grouping"
         self.clusters = disc.clusters
-        self.intervals = disc.transcription
+        self.intervals = disc.intervals
         self.found_pairs = set()
         self.gold_pairs = set()
         self.found_types = set()
@@ -79,6 +79,7 @@ class Grouping(Measure):
         """
         
         for class_nb in self.clusters:
+            ipdb.set_trace()
             self.found_pairs = self.found_pairs.union(combinations(
                                 self.clusters[class_nb],2))
             self.found_types = self.found_types.union({ngram 

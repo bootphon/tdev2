@@ -25,11 +25,11 @@ def gold():
                 phn_path=phn_path)
 
 @pytest.fixture(scope='session')
-def disc():
+def disc(gold):
     pairs_path = pkg_resources.resource_filename(
             pkg_resources.Requirement.parse('WDE'),
             'WDE/share/test_pairs')
-    discovered = Disc(pairs_path)
+    discovered = Disc(pairs_path, gold)
     discovered.read_clusters()
     return discovered
 
@@ -38,9 +38,9 @@ def disc_goldIntervals(gold):
     pairs_path = pkg_resources.resource_filename(
             pkg_resources.Requirement.parse('WDE'),
             'WDE/share/gold.class')
-    discovered = Disc(pairs_path)
+    discovered = Disc(pairs_path, gold)
     #discovered.read_clusters()
-    discovered.intervals2txt(gold.phones)
+    #discovered.intervals2txt(gold.phones)
     return discovered
 
 
@@ -58,7 +58,7 @@ def test_TokenType(gold, disc):
     gold_phn, _, _, _, _ = gold.read_gold_intervalTree(gold.phn_path)
     gold_wrd, _, _, _, _ = gold.read_gold_intervalTree(gold.wrd_path)
     
-    disc.intervals2txt(gold_phn)
+    #disc.intervals2txt(gold_phn)
     #disc_int = disc.transcription
     tokenType = TokenType(gold_phn, gold_wrd, disc)
     tokenType.compute_token_type()
@@ -86,7 +86,7 @@ def test_unknown_filename(disc):
     gold_phn = {'s01': intervaltree.IntervalTree.from_tuples(gold_phn_intervals)}
 
     # test that only one discovered token is counted, not two
-    disc.transcription = [('s06', 1.0, 1.69, ((1.0, 2.0,'tambour'),), 
+    disc.intervals = [('s06', 1.0, 1.69, ((1.0, 2.0,'tambour'),), 
                           ('tambour',))]
 
     with pytest.raises(ValueError) as err:
@@ -102,7 +102,7 @@ def test_token_count_once(disc):
     gold_phn = {'s01': intervaltree.IntervalTree.from_tuples(gold_phn_intervals)}
 
     # test that only one discovered token is counted, not two
-    disc.transcription = [('s01', 1.0, 1.69, ((1.0, 2.0,'tambour'),),
+    disc.intervals = [('s01', 1.0, 1.69, ((1.0, 2.0,'tambour'),),
                           ('tambour',)), ('s01', 1.02, 1.69, ((1.0, 2.0,'tambour'),), ('tambour',))]
 
     tokenType = TokenType(gold_phn, gold_wrd, disc)

@@ -30,9 +30,9 @@ def disc_clusters(gold):
     pairs_path = pkg_resources.resource_filename(
             pkg_resources.Requirement.parse('WDE'),
             'WDE/share/group_clusters.class')
-    discovered = Disc(pairs_path)
+    discovered = Disc(pairs_path, gold)
     #discovered.read_clusters()
-    discovered.intervals2txt(gold.phones)
+    #discovered.intervals2txt(gold.phones)
     return discovered
 
 @pytest.fixture(scope='session')
@@ -40,9 +40,9 @@ def disc_pairs(gold):
     pairs_path = pkg_resources.resource_filename(
             pkg_resources.Requirement.parse('WDE'),
             'WDE/share/group_pairs.class')
-    discovered = Disc(pairs_path)
+    discovered = Disc(pairs_path, gold)
     #discovered.read_clusters()
-    discovered.intervals2txt(gold.phones)
+    #discovered.intervals2txt(gold.phones)
     return discovered
 
 def test_same_pairs_and_class(gold, disc_clusters, disc_pairs):

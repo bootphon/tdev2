@@ -21,7 +21,6 @@ def gold():
             pkg_resources.Requirement.parse('WDE'),
             'WDE/share/english.phn')
 
-               
     return Gold(wrd_path=wrd_path,
                 phn_path=phn_path)
 
@@ -30,9 +29,9 @@ def disc(gold):
     pairs_path = pkg_resources.resource_filename(
             pkg_resources.Requirement.parse('WDE'),
             'WDE/share/test_pairs')
-    discovered = Disc(pairs_path)
+    discovered = Disc(pairs_path, gold)
     #discovered.read_clusters()
-    discovered.intervals2txt(gold.phones)
+    #discovered.intervals2txt(gold.phones)
     return discovered
 
 @pytest.fixture(scope='session')
@@ -40,9 +39,9 @@ def disc_bigIntervals(gold):
     pairs_path = pkg_resources.resource_filename(
             pkg_resources.Requirement.parse('WDE'),
             'WDE/share/bigger_interval.class')
-    discovered = Disc(pairs_path)
+    discovered = Disc(pairs_path, gold)
     #discovered.read_clusters()
-    discovered.intervals2txt(gold.phones)
+    #discovered.intervals2txt(gold.phones)
     return discovered
 
 @pytest.fixture(scope='session')
@@ -50,9 +49,9 @@ def disc_goldIntervals(gold):
     pairs_path = pkg_resources.resource_filename(
             pkg_resources.Requirement.parse('WDE'),
             'WDE/share/gold.class')
-    discovered = Disc(pairs_path)
+    discovered = Disc(pairs_path, gold)
     #discovered.read_clusters()
-    discovered.intervals2txt(gold.phones)
+    #discovered.intervals2txt(gold.phones)
     return discovered
 
 
@@ -81,8 +80,8 @@ def test_boundaries(gold):
 def test_big_intervals(gold, disc_bigIntervals):
      bound = Boundary(gold, disc_bigIntervals)
      bound.compute_boundary()
-     assert bound.precision == 0, "should have found 2 boundaries"
-     assert bound.recall == 0, "recall should be 1.0984062125855384e-05"
+     assert bound.precision == 0.125, "should have found 2 boundaries"
+     assert bound.recall == 1.0984062125855384e-05, "recall should be 1.0984062125855384e-05"
 
 #def test_bad_boundary(gold):
 #    """
