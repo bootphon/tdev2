@@ -95,7 +95,7 @@ class Disc():
                                             disc_off, self.gold_phn)
 
                     intervals.add((fname, disc_on, disc_off, token_ngram, ngram))
-                    classes.append([fname, disc_on, disc_off, token_ngram, ngram])
+                    classes.append((fname, disc_on, disc_off, token_ngram, ngram))
                 elif len(line) == 0:
                     # empty line means that the class has ended 
                     # add class to discovered dict.
