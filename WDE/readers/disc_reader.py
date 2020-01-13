@@ -78,7 +78,7 @@ class Disc():
                 # "Class", so it's the start of a new cluster or it contains an
                 # interval, so add it to current cluster or it is empty, so the
                 # previous cluster has been read entirely
-                if line[:5] == 'Class':  # the class + number + ngram if available
+                if line[:5] == 'Class':  # class + number + ngram if available
                     class_number = line.strip().split(' ')[1]
                     pass
                 elif len(line.split(' ')) == 3:
@@ -92,13 +92,14 @@ class Disc():
                     intervals.add(
                         (fname, disc_on, disc_off, token_ngram, ngram))
                     classes.append(
-                        [fname, disc_on, disc_off, token_ngram, ngram])
+                        (fname, disc_on, disc_off, token_ngram, ngram))
                 elif len(line) == 0:
                     # empty line means that the class has ended
                     # add class to discovered dict.
                     # if entry already exists, exit with an error
-                    assert class_number not in discovered, "Two Classes have the same name in discovered classes"
-                    discovered[class_number]= classes
+                    assert class_number not in discovered, (
+                        "Two Classes have the same name in discovered classes")
+                    discovered[class_number] = classes
 
                     # re-initialize classes
                     classes = list()
@@ -154,7 +155,7 @@ class Disc():
 
         return tuple(token_ngram), tuple(ngram)
 
-    #def intervals2txt(self, gold_phn):
+    # def intervals2txt(self, gold_phn):
     #    """ For each interval, check which gold phones are covered
     #        and phonetically transcribe the intervals to phones.
     #    """

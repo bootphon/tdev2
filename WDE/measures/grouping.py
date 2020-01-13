@@ -77,9 +77,8 @@ class Grouping(Measure):
         """
 
         for class_nb in self.clusters:
-            ipdb.set_trace()
             self.found_pairs = self.found_pairs.union(
-                combinations(self.clusters[class_nb], 2))
+                set(combinations(self.clusters[class_nb], 2)))
 
             self.found_types = self.found_types.union(
                 {ngram for _, _, _, token_ngram, ngram
