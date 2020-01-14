@@ -1,29 +1,29 @@
 #!/usr/bin/env python
-""" Gold object contains a vad, a word alignment and a phone alignmenet.
-    Each alignement can be represented either as an interval tree or 
-    a dictionnary, depending on the usage (interval tree is fast 
-    for interval retrieval/ overal detection)
+"""Gold object contains a vad, a word alignment and a phone alignmenet
+
+Each alignement can be represented either as an interval tree or a dictionnary,
+depending on the usage (interval tree is fast for interval retrieval/ overal
+detection)
+
 """
-### TODO : ADD CHECK THAT ALIGNMENT CONTAINS NO SILENCES !!
+
+# TODO : ADD CHECK THAT ALIGNMENT CONTAINS NO SILENCES !!
 
 import os
-import sys
-import ipdb
-import argparse
-import numpy as np
 import pandas as pd
 import intervaltree
 
 from collections import defaultdict
 
+
 class Gold():
     def __init__(self, vad_path=None, wrd_path=None, phn_path=None):
-        """ Object representing the gold.
-            Contains the VAD,the word alignement and the phone 
-            alignment.
-            The alignments can be stored as interval trees or as 
-            dictionnaries.
-            The interval tree of the silences can also be stored
+        """Object representing the gold.
+
+        Contains the VAD,the word alignement and the phone alignment. The
+        alignments can be stored as interval trees or as dictionnaries. The
+        interval tree of the silences can also be stored.
+
         """
         # paths
         self.vad_path = vad_path
@@ -36,19 +36,21 @@ class Gold():
         self.words = None
 
         # read alignments
-        self.words, _, self.ix2wrd, self.wrd2ix, self.boundaries = self.read_gold_intervalTree(self.wrd_path)
+        self.words, _, self.ix2wrd, self.wrd2ix, self.boundaries = (
+            self.read_gold_intervalTree(self.wrd_path))
+
         if "SIL" in self.wrd2ix:
             print("WARNING: Word alignement contains silences, those will be counted as word by the evaluation.\n"
                   "You should keep them in the phone alignment but remove them from the word alignment.")
-       
-        self.phones, _, self.ix2phn, self.phn2ix, _ = self.read_gold_intervalTree(self.phn_path)
-        #self.boundaries = self.get_boundaries()
-        
 
-    #def get_boundaries(self):
+        self.phones, _, self.ix2phn, self.phn2ix, _ = (
+            self.read_gold_intervalTree(self.phn_path))
+        # self.boundaries = self.get_boundaries()
+
+    # def get_boundaries(self):
     #    '''
     #    Get the gold boundaries by comparing phone and word alignments
-    #    Return: 
+    #    Return:
     #        :return: boundaries: dict, for each filename return a list
     #                             of tuples (lower boundary, upper boundary,
     #                                        lower phone, upper phone, word)
@@ -85,50 +87,58 @@ class Gold():
     #    return boundaries
 
     def read_gold_dict(self, gold_path):
-        ''' 
-        Read the gold phoneme file with fields : speaker/file start end annotation,
-        returns a dict with the file/speaker as a key and the following structure
-        
+        """Read the gold phoneme file with fields: speaker/file start end annotation
+
+        Returns a dict with the file/speaker as a key and the following
+        structure:
+
         gold['speaker'] = [{'start': list(...)}, {'end': list(...), 'symbol': list(...)}]
-        '''
+
+        """
         if not os.path.isfile(gold_path):
             raise ValueError('{}: File Not Found'.format(gold_path))
 
         # Read phone alignment using pandas
-        df = pd.read_table(gold_path, sep=' ', header=None, encoding='utf8',
-                names=['file', 'start', 'end', 'symbol'])
-        
+        df = pd.read_table(
+            gold_path, sep=' ', header=None, encoding='utf8',
+            names=['file', 'start', 'end', 'symbol'])
+
         # sort the data by file and onsets and round the onsets/offsets
         df = df.sort_values(by=['file', 'start'])
         df['start'] = df['start'].round(decimals=4)
         df['end'] = df['end'].round(decimals=4)
-    
-        # number of phones tokens in corpus
-        number_read_symbols = len(df['symbol'])
-    
+
+        # # number of phones tokens in corpus
+        # number_read_symbols = len(df['symbol'])
+
         # get the lexicon and translate to as integers
         symbols = list(set(df['symbol']))
         symbol2ix = {v: k for k, v in enumerate(symbols)}
-        ix2symbols = dict((v,k) for k,v in symbol2ix.items())
+        ix2symbols = dict((v, k) for k, v in symbol2ix.items())
         df['symbol'] = df['symbol'].map(symbol2ix)
-    
-        # timestamps in gold (start, end) must be in acending order for fast search
+
+        # timestamps in gold (start, end) must be in acending order for fast
+        # search
         gold = {}
         verification_num_symbols = 0
         for k in df['file'].unique():
             start = df[df['file'] == k]['start'].values
             end = df[df['file'] == k]['end'].values
             symbols = df[df['file'] == k]['symbol'].values
-    
+
             # check onsets/offsets are ordered
-            #assert not any(np.greater_equal.outer(start[:-1] - start[1:], 0)), 'start in annotation file is not odered!!!'
-            #assert not any(np.greater_equal.outer(end[:-1] - end[1:], 0)), 'end in annotation file is not odered!!!'
-    
-            gold[k] = {'start': list(start), 'end': list(end), 'symbol': list(symbols)} 
+            # assert not any(np.greater_equal.outer(start[:-1] - start[1:], 0)), 'start in annotation file is not odered!!!'
+            # assert not any(np.greater_equal.outer(end[:-1] - end[1:], 0)), 'end in annotation file is not odered!!!'
+
+            gold[k] = {
+                'start': list(start),
+                'end': list(end),
+                'symbol': list(symbols)}
+
             verification_num_symbols += len(gold[k]['symbol'])
-    
-        #logging.debug("%d symbolss read from %s (%d returned)", number_read_symbols,
-        #        gold_path, verification_num_symbols) 
+
+        # logging.debug("%d symbolss read from %s (%d returned)", number_read_symbols,
+        #         gold_path, verification_num_symbols)
 
         return gold, ix2symbols, symbol2ix
 
@@ -166,10 +176,11 @@ class Gold():
                 try:
                     fname, on, off, symbol = line.strip('\n').split(' ')
                 except:
-                    raise ValueError('format of alignement should be:\n'
-                            '\tfilename onset offset symbol\n'
-                            'but alignment contains wrongly formated line:\n'
-                            '{}'.format(line))
+                    raise ValueError(
+                        'format of alignement should be:\n'
+                        '\tfilename onset offset symbol\n'
+                        'but alignment contains wrongly formated line:\n'
+                        '{}'.format(line))
                 transcription[(fname, float(on), float(off))] = symbol
                 symbols.add(symbol)
                 intervals[fname].append((float(on), float(off), symbol))
@@ -178,13 +189,14 @@ class Gold():
 
             # for each filename, create an interval tree
             for fname in intervals:
-                gold[fname] = intervaltree.IntervalTree.from_tuples(intervals[fname])
+                gold[fname] = intervaltree.IntervalTree.from_tuples(
+                    intervals[fname])
 
         # create a mapping index -> symbols for the phones
         symbol2ix = {v: k for k, v in enumerate(list(symbols))}
-        ix2symbols = dict((v,k) for k,v in symbol2ix.items())
+        ix2symbols = dict((v, k) for k, v in symbol2ix.items())
 
-        # boundaries_down: contains all down boundaries, 
+        # boundaries_down: contains all down boundaries,
         # boundaries_up: contains all up boundaries that do not already
         # occur un boundaries_down
         for fname in boundaries_up:
@@ -195,41 +207,41 @@ class Gold():
                 symbol2ix, (boundaries_up, boundaries_down))
 
     def get_intervals(fname, on, off, gold, transcription):
-        """ Given a filename and an interval, retrieve the list of 
+        """ Given a filename and an interval, retrieve the list of
         covered intervals, and their transcription.
-        This is done using intervaltree.search, which is supposed to 
-        work in O(log(n) + m), n being the number of intervals and m 
+        This is done using intervaltree.search, which is supposed to
+        work in O(log(n) + m), n being the number of intervals and m
         the number of covered intervals.
         """
         def overlap(a, b, interval):
-            ov = (min(b, interval[1]) - max(a, interval[0]))\
-                    /(interval[1] - interval[0])
+            ov = (min(b, interval[1]) - max(a, interval[0])) \
+                    / (interval[1] - interval[0])
             time = min(b, interval[1]) - max(a, interval[0])
             return ov, time
-    
+
         # search interval tree
         _cov_int = gold[fname].overlap(on, off)
-        cov_int = set() # set of kept intervals
-        cov_trs = [] # retrieved transcription
-    
+        cov_int = set()  # set of kept intervals
+        cov_trs = []  # retrieved transcription
+
         # check each interval to see if we keep it or not.
         # In particular, check if found interval contains
         # more than 30 ms or more than 50% of phone.
         for interval in _cov_int:
             int_ov, time = overlap(on, off, interval)
-            if round(int_ov, 4) >= 0.50 or round(time,4) >= 0.03:
-                cov_trs.append((interval[0], interval[1], transcription[(fname, interval[0], interval[1])]))
+            if round(int_ov, 4) >= 0.50 or round(time, 4) >= 0.03:
+                cov_trs.append(
+                    (interval[0], interval[1],
+                     transcription[(fname, interval[0], interval[1])]))
                 cov_int.add((interval[0], interval[1]))
-        
+
         # finally, sort the transcription by onsets, because intervaltree
         # doesn't necessarily return the intervals in order...
         cov_trs.sort()
         trs = [t for b, e, t in cov_trs]
-    
+
         return cov_int, trs
-    
 
     def get_silence_intervals(self, vad):
         ''' Compute interval tree of silences '''
         pass
-

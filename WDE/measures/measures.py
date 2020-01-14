@@ -1,12 +1,13 @@
 """Implement class Measure.
    This class defines the object Measure, from which all measure inherit
-   and that allows to store precision, recall and fscore. 
+   and that allows to store precision, recall and fscore.
    It also contains functions to pretty print, write into files...
 """
 
+
 class Measure():
-    def __init__():
-        pass
+    def __init__(self, output_folder):
+        self.output_folder = output_folder
 
     def __repr__(self):
         return 'metric: {}\nrecall: {}\nprecision: {}\nfscore: {}'.format(
@@ -14,19 +15,19 @@ class Measure():
 
     @property
     def precision(self):
-        raise  NotImplementedError('Should not use Measure.precision directly')
+        raise NotImplementedError('Should not use Measure.precision directly')
 
     @property
     def recall(self):
-        raise  NotImplementedError('Should not use Measure.recall directly')
-
+        raise NotImplementedError('Should not use Measure.recall directly')
 
     @property
     def fscore(self):
         if not (self.recall and self.precision):
             raise ValueError('Attempting to compute fscore when precision'
                              ' and recall are not yet computed!')
-        return 2 * (self.precision * self.recall) / (self.precision + self.recall)
+        return 2 * (self.precision * self.recall) / (
+            self.precision + self.recall)
 
     def write_score(self):
         if not self.fscore:
