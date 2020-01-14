@@ -1,3 +1,5 @@
+import os
+
 from .measures import Measure
 
 
@@ -23,7 +25,7 @@ class Coverage(Measure):
 
         self.coverage = 0
 
-    def compute_cov(self):
+    def compute_coverage(self):
         """ For coverage, simply compute the ratio of discovered phones over all phone
 
             Input:
@@ -34,3 +36,11 @@ class Coverage(Measure):
                                  the overall number of phones in the corpus
         """
         self.coverage = len(self.covered_phn) / self.n_phones
+
+    def write_score(self):
+        if not self.coverage:
+            raise AttributeError('Attempting to print scores but score'
+                                 ' is not yet computed!')
+        with open(os.path.join(self.output_folder, self.metric_name), 'w') as fout:
+            fout.write("metric: {}\n".format(self.metric_name))
+            fout.write("coverage: {}\n".format(self.coverage))

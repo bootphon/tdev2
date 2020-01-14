@@ -1,4 +1,4 @@
-import ipdb
+import os
 import numpy as np
 
 from .measures import Measure
@@ -7,7 +7,7 @@ from WDE.utils import overlap
 
 class TokenType(Measure):
     def __init__(self, gold, disc, output_folder=None):
-        self.metric_name = "token type"
+        self.metric_name = "token_type"
         self.output_folder = output_folder
 
         # get gold as interval trees
@@ -132,7 +132,6 @@ class TokenType(Measure):
             # onset and offset are less than 30ms or 50% away
             # from border phone boundaries, then don't count
             if len(overlap_wrd) < 1:
-                ipdb.set_trace()
                 continue
             elif len(overlap_wrd) > 1:
                 # choose word with the most overlap
@@ -166,3 +165,21 @@ class TokenType(Measure):
             # TODO CHECK HOMOPHONE CASE W/ EMMANUEL
             if ((gold_wrd_trs == ngram) and ngram not in self.type_hit):
                 self.type_hit.add(ngram)
+
+    def write_score(self):
+        #if not self.token_fscore:
+        #    raise AttributeError('Attempting to print scores but fscore'
+        #                         ' is not yet computed!')
+        token_prec, type_prec = self.precision
+        token_rec, type_rec = self.recall
+        token_fscore, type_fscore = self.fscore
+        with open(os.path.join(self.output_folder, self.metric_name), 'w') as fout:
+            fout.write("metric: {}\n".format('token'))
+            fout.write("precision: {}\n".format(token_prec))
+            fout.write("recall: {}\n".format(token_rec))
+            fout.write("fscore: {}\n".format(token_fscore))
+            fout.write("metric: {}\n".format('type'))
+            fout.write("precision: {}\n".format(type_prec))
+            fout.write("recall: {}\n".format(type_rec))
+            fout.write("fscore: {}\n".format(type_fscore))
+

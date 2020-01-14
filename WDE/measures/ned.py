@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import editdistance
 
@@ -5,7 +6,7 @@ from .measures import Measure
 from itertools import combinations
 
 
-class ned(Measure):
+class Ned(Measure):
     def __init__(self, disc, output_folder=None):
         self.metric_name = "ned"
         self.output_folder = output_folder
@@ -40,3 +41,11 @@ class ned(Measure):
                 pair_ned = self.pairwise_ned(ngram1, ngram2)
                 overall_ned.append(pair_ned)
         self.ned = np.mean(overall_ned)
+
+    def write_score(self):
+        if not self.ned:
+            raise AttributeError('Attempting to print scores but score'
+                                 ' is not yet computed!')
+        with open(os.path.join(self.output_folder, self.metric_name), 'w') as fout:
+            fout.write("metric: {}\n".format(self.metric_name))
+            fout.write("score: {}\n".format(self.ned))

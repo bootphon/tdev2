@@ -3,7 +3,7 @@
    and that allows to store precision, recall and fscore.
    It also contains functions to pretty print, write into files...
 """
-
+import os
 
 class Measure():
     def __init__(self, output_folder):
@@ -33,7 +33,7 @@ class Measure():
         if not self.fscore:
             raise AttributeError('Attempting to print scores but fscore'
                                  ' is not yet computed!')
-        with open(self.output_folder, 'w') as fout:
+        with open(os.path.join(self.output_folder, self.metric_name), 'w') as fout:
             fout.write("metric: {}\n".format(self.metric_name))
             fout.write("precision: {}\n".format(self.precision))
             fout.write("recall: {}\n".format(self.recall))
