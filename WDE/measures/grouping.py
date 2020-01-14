@@ -9,7 +9,7 @@ from collections import defaultdict, Counter
 from WDE.utils import overlap, check_boundary
 
 class Grouping(Measure):
-    def __init__(self, gold, disc):
+    def __init__(self, disc):
         self.metric_name = "grouping"
         self.clusters = disc.clusters
         self.intervals = disc.intervals

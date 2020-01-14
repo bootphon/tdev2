@@ -7,16 +7,16 @@ from .measures import Measure
 from WDE.utils import overlap, check_boundary
 
 class TokenType(Measure):
-    def __init__(self, gold_phn, gold_wrd, disc):
+    def __init__(self, gold, disc):
         self.metric_name = "token type"
         # get gold as interval trees
-        self.gold_phn = gold_phn
+        self.gold_phn = gold.phones
 
-        assert type(gold_phn) == dict, ("gold_phn should be a dict "
-           "of intervaltree objects but is {} ".format(type(gold_phn)))
-        self.gold_wrd = gold_wrd
-        assert type(gold_wrd) == dict, ("gold_phn should be a dict "
-           "of intervaltree objects but is {} ".format(type(gold_wrd)))
+        assert type(self.gold_phn) == dict, ("gold_phn should be a dict "
+           "of intervaltree objects but is {} ".format(type(self.gold_phn)))
+        self.gold_wrd = gold.words
+        assert type(self.gold_wrd) == dict, ("gold_wrd should be a dict "
+           "of intervaltree objects but is {} ".format(type(self.gold_wrd)))
         self.all_type = set()
         self.n_token = 0
 

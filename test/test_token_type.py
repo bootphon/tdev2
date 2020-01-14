@@ -39,28 +39,25 @@ def disc_goldIntervals(gold):
             pkg_resources.Requirement.parse('WDE'),
             'WDE/share/gold.class')
     discovered = Disc(pairs_path, gold)
-    #discovered.read_clusters()
-    #discovered.intervals2txt(gold.phones)
     return discovered
 
 
 def test_TokenType_init(gold, disc):
-    gold_phn, _, _, _, _ = gold.read_gold_intervalTree(gold.phn_path)
-    gold_wrd, _, _, _, _ = gold.read_gold_intervalTree(gold.wrd_path)
-    print(type(gold_phn)) 
-    _init = TokenType(gold_phn, gold_wrd, disc)
+    #gold_phn, _, _, _, _ = gold.read_gold_intervalTree(gold.phn_path)
+    #gold_wrd, _, _, _, _ = gold.read_gold_intervalTree(gold.wrd_path)
+    _init = TokenType(gold, disc)
 
     assert len(_init.all_type) == 4538, "wrong number of type detected"
     assert _init.n_token == 69543, "wrong number of token detected"
 
 def test_TokenType(gold, disc):
 
-    gold_phn, _, _, _, _ = gold.read_gold_intervalTree(gold.phn_path)
-    gold_wrd, _, _, _, _ = gold.read_gold_intervalTree(gold.wrd_path)
+    #gold_phn, _, _, _, _ = gold.read_gold_intervalTree(gold.phn_path)
+    #gold_wrd, _, _, _, _ = gold.read_gold_intervalTree(gold.wrd_path)
     
     #disc.intervals2txt(gold_phn)
     #disc_int = disc.transcription
-    tokenType = TokenType(gold_phn, gold_wrd, disc)
+    tokenType = TokenType(gold, disc)
     tokenType.compute_token_type()
 
     #token_hit 6924
@@ -78,34 +75,34 @@ def test_TokenType(gold, disc):
 def test_bad_tokens(gold):
     pass
 
-def test_unknown_filename(disc):
+def test_unknown_filename(gold, disc):
     gold_wrd_intervals = [(1.0, 2.0, 'tambour'), (3.0, 4.0 , 'cassoulet')]
     gold_phn_intervals = gold_wrd_intervals 
     
-    gold_wrd = {'s01': intervaltree.IntervalTree.from_tuples(gold_wrd_intervals)}
-    gold_phn = {'s01': intervaltree.IntervalTree.from_tuples(gold_phn_intervals)}
+    gold.words = {'s01': intervaltree.IntervalTree.from_tuples(gold_wrd_intervals)}
+    gold.phones = {'s01': intervaltree.IntervalTree.from_tuples(gold_phn_intervals)}
 
     # test that only one discovered token is counted, not two
     disc.intervals = [('s06', 1.0, 1.69, ((1.0, 2.0,'tambour'),), 
                           ('tambour',))]
 
     with pytest.raises(ValueError) as err:
-        tokenType = TokenType(gold_phn, gold_wrd, disc)
+        tokenType = TokenType(gold, disc)
         tok_prec, tok_rec, typ_prec, typ_rec = tokenType.compute_token_type()
     assert 'file not found' in str(err.value)
 
-def test_token_count_once(disc):
+def test_token_count_once(gold, disc):
     gold_wrd_intervals = [(1.0, 2.0, 'tambour'), (3.0, 4.0 , 'cassoulet')]
     gold_phn_intervals = gold_wrd_intervals 
     
-    gold_wrd = {'s01': intervaltree.IntervalTree.from_tuples(gold_wrd_intervals)}
-    gold_phn = {'s01': intervaltree.IntervalTree.from_tuples(gold_phn_intervals)}
+    gold.words = {'s01': intervaltree.IntervalTree.from_tuples(gold_wrd_intervals)}
+    gold.phones = {'s01': intervaltree.IntervalTree.from_tuples(gold_phn_intervals)}
 
     # test that only one discovered token is counted, not two
     disc.intervals = [('s01', 1.0, 1.69, ((1.0, 2.0,'tambour'),),
                           ('tambour',)), ('s01', 1.02, 1.69, ((1.0, 2.0,'tambour'),), ('tambour',))]
 
-    tokenType = TokenType(gold_phn, gold_wrd, disc)
+    tokenType = TokenType(gold, disc)
 
     tokenType.compute_token_type()
     tok_prec, typ_prec = tokenType.precision
@@ -117,7 +114,7 @@ def test_token_count_once(disc):
            " 1.0, and type recall 0.5, as all covered types were discovered")
 
 def test_gold_intervals(gold, disc_goldIntervals):
-    tokenType = TokenType(gold.phones, gold.words, disc_goldIntervals)
+    tokenType = TokenType(gold, disc_goldIntervals)
     tokenType.compute_token_type()
 
     tok_prec, typ_prec = tokenType.precision
