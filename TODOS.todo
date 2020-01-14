@@ -1,5 +1,3 @@
-- Transcription is required for every measure, make it faster and automatic. 
-
 - Simplify/optimize transcription for clusters
 
-- CHECK DIFFERENCE MOT/NGRAM 200/500ms 
+- Parallelize some stuff ?  
