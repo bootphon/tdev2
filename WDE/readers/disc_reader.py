@@ -38,7 +38,10 @@ class Disc():
         self.disc_path = disc_path
         self.clusters = None
         self.intervals = None
-        self.gold_phn = gold.phones
+        if gold:
+            self.gold_phn = gold.phones
+        else:
+            self.gold_phn = None
         # self.transcription = None
         self.intervals_tree = None
         # set intervals
@@ -70,7 +73,12 @@ class Disc():
         intervals = set()
         # file is decoded line by line and ned statistics are computed in
         # a streaming to avoid using a high amount of memory
-        with codecs.open(self.disc_path, encoding='utf8') as cfile:
+        with open(self.disc_path) as fin:
+            cfile = fin.readlines()
+
+            # check that last line is empty
+            assert cfile[-1] == '\n', ("discovered class file should end with"
+                                     " and empty line")
             for lines in cfile:
                 line = lines.strip()
 
@@ -80,14 +88,14 @@ class Disc():
                 # previous cluster has been read entirely
                 if line[:5] == 'Class':  # class + number + ngram if available
                     class_number = line.strip().split(' ')[1]
-                    pass
                 elif len(line.split(' ')) == 3:
                     fname, start, end = line.split(' ')
                     disc_on, disc_off = float(start), float(end)
 
                     # get the phone transcription for current interval
-                    token_ngram, ngram = self.get_transcription(
-                        fname, disc_on, disc_off, self.gold_phn)
+                    token_ngram, ngram = (self.get_transcription(
+                     fname, disc_on, disc_off, self.gold_phn)) #if self.gold_phn
+                    #else None, None)
 
                     intervals.add(
                         (fname, disc_on, disc_off, token_ngram, ngram))
@@ -98,19 +106,22 @@ class Disc():
                     # add class to discovered dict.
                     # if entry already exists, exit with an error
                     assert class_number not in discovered, (
-                        "Two Classes have the same name in discovered classes")
+                        "Two Classes have the same number {}"
+                        " in discovered classes".format(class_number))
+                    assert len(classes) > 0, ('class {} if empty')
                     discovered[class_number] = classes
 
                     # re-initialize classes
                     classes = list()
                 else:
-                    print("Line in discovered classes has wrong format")
-                    print("{}".format(line))
+                    raise ValueError('Line in discovered classes has wrong'
+                            ' format\n {}\n'.format(line))
 
         self.clusters = discovered
         self.intervals = list(intervals)
 
-        print("{} unique intervals".format(len(self.intervals)))
+        print("Discovered Class file read\n")
+        print("{} unique intervals found".format(len(self.intervals)))
 
     def read_intervals_tree(self):
         """ Read discovered intervals as interval tree"""
@@ -122,7 +133,6 @@ class Disc():
     @staticmethod
     def get_transcription(fname, disc_on, disc_off, gold_phn):
         """ Given an interval, get its phone transcription"""
-
         # Get all covered phones
         covered = sorted(
             [phn for phn
@@ -155,46 +165,3 @@ class Disc():
 
         return tuple(token_ngram), tuple(ngram)
 
-    # def intervals2txt(self, gold_phn):
-    #    """ For each interval, check which gold phones are covered
-    #        and phonetically transcribe the intervals to phones.
-    #    """
-
-    #    token_ngram = []
-    #    ngram = []
-    #    intervals_transcription = []
-    #    #ipdb.set_trace()
-    #    #for fname, disc_on, disc_off in self.intervals:
-    #    for class_nb in self.clusters:
-    #        class_trs = []
-    #        for fname, disc_on, disc_off in self.clusters[class_nb]:
-
-    #            # Get all covered phones
-    #            covered = sorted([phn  for phn
-    #                                  in gold_phn[fname].overlap(disc_on, disc_off)],
-    #                                  key=lambda times: times[0])
-    #            # Check if first and last phones are discovered
-    #            keep_first = check_boundary((covered[0][0], covered[0][1]),
-    #                                      (disc_on, covered[0][1]))
-    #            keep_last = check_boundary((covered[-1][0], covered[-1][1]),
-    #                                      (covered[-1][0], disc_off))
-
-    #            if keep_first:
-    #                token_ngram = [(covered[0][0], covered[0][1],
-    #                          covered[0][2])]
-    #                ngram = [covered[0][2]]
-    #            else:
-    #                token_ngram = []
-    #                ngram = []
-
-    #            token_ngram += [ (on, off, phn) for on, off, phn in covered[1:-1]]
-    #            ngram += [phn for on, off, phn in covered[1:-1]]
-
-    #            if keep_last and len(covered) > 1:
-    #                token_ngram += [(covered[-1][0], covered[-1][1],
-    #                          covered[-1][2])]
-    #                ngram += [covered[-1][2]]
-    #            intervals_transcription.append((fname, disc_on, disc_off, tuple(token_ngram), tuple(ngram)))
-    #            class_trs.append((fname, disc_on, disc_off, tuple(token_ngram), tuple(ngram)))
-    #        self.clusters[class_nb] = class_trs
-    #    self.transcription = intervals_transcription
