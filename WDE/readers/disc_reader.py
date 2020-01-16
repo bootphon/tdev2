@@ -93,9 +93,13 @@ class Disc():
                     disc_on, disc_off = float(start), float(end)
 
                     # get the phone transcription for current interval
-                    token_ngram, ngram = (self.get_transcription(
-                     fname, disc_on, disc_off, self.gold_phn)) #if self.gold_phn
-                    #else None, None)
+                    if self.gold_phn:
+                        token_ngram, ngram = (self.get_transcription(
+                         fname, disc_on, disc_off, self.gold_phn))
+                    else:
+                        print("Warning: discovered file was read"
+                              " without gold, so no transcription is read")
+                        token_ngram, ngram = None, None
 
                     intervals.add(
                         (fname, disc_on, disc_off, token_ngram, ngram))
