@@ -7,6 +7,21 @@ Implements some of the metrics described in [this paper](https://core.ac.uk/down
 
 Basic idea: phonetically transcribed each discovered item, then apply NLP evaluations.
 
+Installation
+------------
+
+Install the required packages using pip
+
+```bash
+pip install -r requirements.txt
+```
+
+And install the package
+
+```bash
+python setup.py build && python setup.py install
+```
+
 How To Use
 ----------
 
