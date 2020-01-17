@@ -80,9 +80,11 @@ class Grouping(Measure):
             self.found_pairs = self.found_pairs.union(
                 set(combinations(self.clusters[class_nb], 2)))
 
-            self.found_types = self.found_types.union(
-                {ngram for _, _, _, token_ngram, ngram
-                 in self.clusters[class_nb]})
+            # count type only if clusters has two elements
+            if len(self.clusters[class_nb]) > 1 :
+                self.found_types = self.found_types.union(
+                    {ngram for _, _, _, token_ngram, ngram
+                    in self.clusters[class_nb]})
 
         # order found pairs
         self.found_pairs = {
