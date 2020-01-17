@@ -34,7 +34,25 @@ def gold_vad():
                 phn_path=phn_path,
                 vad_path=vad_path)
 
+@pytest.fixture(scope='session')
+def mandarin_gold():
+    wrd_path = pkg_resources.resource_filename(
+            pkg_resources.Requirement.parse('WDE'),
+            'WDE/share/mandarin.wrd')
+    phn_path = pkg_resources.resource_filename(
+            pkg_resources.Requirement.parse('WDE'),
+            'WDE/share/mandarin.phn')
 
+    return Gold(wrd_path=wrd_path,
+                phn_path=phn_path)
+
+@pytest.fixture(scope='session')
+def kamper_disc(mandarin_gold):
+    pairs_path = pkg_resources.resource_filename(
+            pkg_resources.Requirement.parse('WDE'),
+            'WDE/share/kamper_mandarin.class')
+    discovered = Disc(pairs_path, mandarin_gold)
+    return discovered 
 @pytest.fixture(scope='session')
 def gold_disc(gold):
     pairs_path = pkg_resources.resource_filename(

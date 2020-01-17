@@ -1,4 +1,5 @@
 import os
+import ipdb
 
 from .measures import Measure
 
@@ -18,10 +19,11 @@ class Coverage(Measure):
                 if (ph != "SIL" and ph != "SPN")])
 
         self.covered_phn = set(
-            (fname, phn_on, phn_off)
+            (fname, phn_on, phn_off, phn)
             for fname, disc_on, disc_off, token_ngram, ngram
             in disc.intervals
-            for phn_on, phn_off, phn in token_ngram)
+            for phn_on, phn_off, phn in token_ngram
+            if (phn != "SIL" and phn != "SPN"))
 
         self.coverage = 0
 
