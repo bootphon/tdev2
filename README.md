@@ -52,22 +52,38 @@ phn_path=phn_path)
 discovered = Disc(pairs_path, gold) 
 ```
 
-then you can call the measures: 
+then you can compute the measures using the eval.py script
+
+```bash
+python eval.py discovered_class output/
+```
+
+or using the python API
 
 ```python
-from WDE.measures.grouping import * 
+import pkg_resources 
+from WDE.readers.gold_reader import *
+from WDE.readers.disc_reader import *
+wrd_path = pkg_resources.resource_filename(
+            pkg_resources.Requirement.parse('WDE'),
+            'WDE/share/mandarin.wrd')
+phn_path = pkg_resources.resource_filename(
+            pkg_resources.Requirement.parse('WDE'),
+            'WDE/share/mandarin.phn')
 
-grouping = Grouping(gold, discovered)
+gold = Gold(wrd_path=wrd_path, 
+                phn_path=phn_path) 
+
+disc_clsfile = "/path/to/discovered/file"
+
+disc = Disc(disc_clsfile, gold) 
+
+from WDE.measures.grouping import * 
+grouping = Grouping(discovered)
 grouping.compute_grouping()
 
 print(grouping.precision)
 print(grouping.recall)
 ```
-
-
-# Choices:
-
-Silences are kept in the phone alignments and are treated as phones. They are not kept in the word alignements though
-and don't count as tokens/types. TODO simplify this to add it in reader (with asserts to check correctness).
 
 
