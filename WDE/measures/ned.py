@@ -43,7 +43,7 @@ class Ned(Measure):
         self.ned = np.mean(overall_ned)
 
     def write_score(self):
-        if not self.ned:
+        if self.ned is None:
             raise AttributeError('Attempting to print scores but score'
                                  ' is not yet computed!')
         with open(os.path.join(self.output_folder, self.metric_name), 'w') as fout:

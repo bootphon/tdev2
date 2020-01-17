@@ -23,14 +23,15 @@ class Measure():
 
     @property
     def fscore(self):
-        if not (self.recall and self.precision):
+        if not (self.recall is not None
+                and self.precision is not None):
             raise ValueError('Attempting to compute fscore when precision'
                              ' and recall are not yet computed!')
         return 2 * (self.precision * self.recall) / (
             self.precision + self.recall)
 
     def write_score(self):
-        if not self.fscore:
+        if self.fscore is None:
             raise AttributeError('Attempting to print scores but fscore'
                                  ' is not yet computed!')
         with open(os.path.join(self.output_folder, self.metric_name), 'w') as fout:
