@@ -33,8 +33,7 @@ def check_boundary(gold_times, disc_times):
         :return:           Bool, True if phone is considered discovered,
                            False otherwise
     """
-
-    gold_dur = gold_times[1] - gold_times[0]
+    gold_dur = round(gold_times[1] - gold_times[0], 3)
     ov, ov_time = overlap(disc_times, gold_times)
 
     # if gold phone is over 60 ms, rule is phone is considered if
@@ -58,5 +57,5 @@ def check_boundary(gold_times, disc_times):
 def overlap(disc, gold):
     ov = (min(disc[1], gold[1]) - max(disc[0], gold[0])) \
         / (gold[1] - gold[0])
-    time = min(disc[1], gold[1]) - max(disc[0], gold[0])
+    time = round(min(disc[1], gold[1]) - max(disc[0], gold[0]), 3)
     return ov, time
