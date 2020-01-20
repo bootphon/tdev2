@@ -21,19 +21,23 @@ class Boundary(Measure):
         bounds_up = [(fname, ngram[-1][1])
                      for fname, _, _, ngram, _ in disc.intervals]
         self.disc_down = set(bounds_down)
-        self.disc_up = set(bounds_up).difference(
-                set(bounds_up).intersection(self.disc_down))
+        self.disc_up = set(bounds_up)
 
         # measures
         self.boundaries = dict()
         self.boundaries_seen = set()
         self.n_correct_disc_boundary = 0
 
-        self.n_all_disc_boundary = len(self.disc_up) + len(self.disc_down)
+        # if boundary is discovered as up and down, only count it once
+        self.n_all_disc_boundary = len(self.disc_up.difference(
+            self.disc_up.intersection(self.disc_down))) + len(self.disc_down)
         self.n_gold_boundary = 0
         self.n_discovered_boundary = 0
         for fname in self.gold_boundaries_up:
-            self.n_gold_boundary += len(self.gold_boundaries_up[fname])
+            self.n_gold_boundary += len(
+               self.gold_boundaries_up[fname].difference(
+                self.gold_boundaries_up[fname].intersection(
+                 self.gold_boundaries_down[fname])))
             self.n_gold_boundary += len(self.gold_boundaries_down[fname])
 
     @property
@@ -78,8 +82,13 @@ class Boundary(Measure):
             if fname not in self.gold_boundaries_down:
                 raise ValueError('{}: file not found in gold'.format(fname))
 
-            if disc_time in self.gold_boundaries_down[fname]:
+            if (
+                    disc_time in self.gold_boundaries_down[fname]
+                    and not (fname, disc_time) in self.boundaries_seen
+            ):
+
                 self.n_discovered_boundary += 1
+                self.boundaries_seen.add((fname, disc_time))
 
         # upward boundaries
         for fname, disc_time in self.disc_up:

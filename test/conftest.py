@@ -53,6 +53,15 @@ def kamper_disc(mandarin_gold):
             'WDE/share/kamper_mandarin.class')
     discovered = Disc(pairs_path, mandarin_gold)
     return discovered 
+
+@pytest.fixture(scope='session')
+def ZR17_disc(mandarin_gold):
+    pairs_path = pkg_resources.resource_filename(
+            pkg_resources.Requirement.parse('WDE'),
+            'WDE/share/ZR17_mandarin.class')
+    discovered = Disc(pairs_path, mandarin_gold)
+    return discovered 
+
 @pytest.fixture(scope='session')
 def gold_disc(gold):
     pairs_path = pkg_resources.resource_filename(

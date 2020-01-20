@@ -196,13 +196,6 @@ class Gold():
         symbol2ix = {v: k for k, v in enumerate(list(symbols))}
         ix2symbols = dict((v, k) for k, v in symbol2ix.items())
 
-        # boundaries_down: contains all down boundaries,
-        # boundaries_up: contains all up boundaries that do not already
-        # occur un boundaries_down
-        for fname in boundaries_up:
-            boundaries_up[fname] = boundaries_up[fname].difference(
-                    boundaries_up[fname].intersection(boundaries_down[fname]))
-
         return (gold, transcription, ix2symbols,
                 symbol2ix, (boundaries_up, boundaries_down))
 

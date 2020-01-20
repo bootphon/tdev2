@@ -37,19 +37,17 @@ def test_big_intervals(gold, disc_bigIntervals):
         "recall should be 1.0984062125855384e-05")
 
 
-# def test_bad_boundary(gold):
-#    """
-#        No boundary found
-#    """
-#    bound = Boundary(gold, disc)
-
 
 def test_disc_is_gold(gold, disc_goldIntervals):
     """ Test boundary result when discovered intervals are gold"""
     bound = Boundary(gold, disc_goldIntervals)
     bound.compute_boundary()
-    print("gold")
-    print(bound.precision)
-    print(bound.recall)
     assert bound.precision == 1.0, "should have 100% precision"
     assert bound.recall == 1.0, "should have 100% recall"
+
+def test_ZR17Disc_subpart(mandarin_gold, ZR17_disc):
+    bound = Boundary(mandarin_gold, ZR17_disc)
+    bound.compute_boundary()
+
+    assert bound.n_discovered_boundary == 12, ("should have found "
+            "13 boundaries in those pairs")
