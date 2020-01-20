@@ -38,10 +38,10 @@ def gold_vad():
 def mandarin_gold():
     wrd_path = pkg_resources.resource_filename(
             pkg_resources.Requirement.parse('WDE'),
-            'WDE/share/mandarin.wrd')
+            'WDE/share/ZR17/mandarin.wrd')
     phn_path = pkg_resources.resource_filename(
             pkg_resources.Requirement.parse('WDE'),
-            'WDE/share/mandarin.phn')
+            'WDE/share/ZR17/mandarin.phn')
 
     return Gold(wrd_path=wrd_path,
                 phn_path=phn_path)

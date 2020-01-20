@@ -7,8 +7,6 @@ detection)
 
 """
 
-# TODO : ADD CHECK THAT ALIGNMENT CONTAINS NO SILENCES !!
-
 import os
 import pandas as pd
 import intervaltree
@@ -37,54 +35,15 @@ class Gold():
 
         # read alignments
         self.words, _, self.ix2wrd, self.wrd2ix, self.boundaries = (
-            self.read_gold_intervalTree(self.wrd_path))
+            self.read_gold_intervalTree(self.wrd_path, "word"))
 
         if "SIL" in self.wrd2ix:
             print("WARNING: Word alignement contains silences, those will be counted as word by the evaluation.\n"
                   "You should keep them in the phone alignment but remove them from the word alignment.")
 
         self.phones, _, self.ix2phn, self.phn2ix, _ = (
-            self.read_gold_intervalTree(self.phn_path))
+            self.read_gold_intervalTree(self.phn_path, "phone"))
         # self.boundaries = self.get_boundaries()
-
-    # def get_boundaries(self):
-    #    '''
-    #    Get the gold boundaries by comparing phone and word alignments
-    #    Return:
-    #        :return: boundaries: dict, for each filename return a list
-    #                             of tuples (lower boundary, upper boundary,
-    #                                        lower phone, upper phone, word)
-    #    '''
-    #    if not os.path.isfile(self.phn_path):
-    #        raise ValueError('{}: Phone Alignment Not Found'.format(self.phn_path))
-    #    if not os.path.isfile(self.wrd_path):
-    #        raise ValueError('{}: Word Alignment Not Found'.format(self.phn_path))
-
-    #    # Read phone/word alignment using pandas
-    #    phn = pd.read_table(self.phn_path, sep=' ', header=None, encoding='utf8',
-    #            names=['file', 'start', 'end', 'symbol'])
-    #    wrd = pd.read_table(self.phn_path, sep=' ', header=None, encoding='utf8',
-    #            names=['file', 'start', 'end', 'symbol'])
-
-    #    # get lower boundaries and upper boundaries by merging dataframes
-    #    bound_low = pd.merge(phn, wrd, how='inner', on=['file', 'start'])
-    #    bound_high = pd.merge(phn, wrd, how='inner', on=['file', 'end'])
-
-    #    assert len(bound_low) == len(bound_high), ("phone and word alignement aren't"
-    #            " correctly aligned, the timestamps should correspond for beginnings"
-    #            " and endings of words")
-
-    #    # output boundaries
-    #    boundaries = dict()
-    #    for fname in phn['file'].unique():
-    #        lower = bound_low[bound_low['file'] == fname]['start'].values
-    #        upper = bound_high[bound_high['file'] == fname]['end'].values
-    #        #phn_low = bound_low[bound_low['file'] == fname]['symbol_x'].values
-    #        #phn_up = bound_high[bound_high['file'] == fname]['symbol_x'].values
-    #        #word = bound_low[bound_low['file'] == fname]['symbol_y'].values
-    #        #boundaries[fname] = list(zip(lower,upper,phn_low, phn_up, word))
-    #        boundaries[fname] = set(lower + upper)
-    #    return boundaries
 
     def read_gold_dict(self, gold_path):
         """Read the gold phoneme file with fields: speaker/file start end annotation
@@ -142,14 +101,17 @@ class Gold():
 
         return gold, ix2symbols, symbol2ix
 
-    def read_gold_intervalTree(self, gold_path):
+    def read_gold_intervalTree(self, gold_path, symbol_type=None):
         '''Read the gold alignment and build an interval tree (O( log(n) )).
         After that, take each found interval, search for its overlaps
         (O( log(n) + m), m being the number of results found),
         and check if we want to keep each interval.
         INPUT
         =====
-        - phn_gold : the path to the gold alignment
+        - gold : the path to the gold alignment
+        - symbol_type: string, "word" or "phone",
+                       if "word", don't  keep the silences if some are found
+                       if "phone", keep them and raise warning if none are found
         OUTPUT
         ======
         - gold: a dict {fname: intervaltree} which returns the interval tree
@@ -168,7 +130,9 @@ class Gold():
         transcription = dict() # create dict that returns the transcription for an interval
         boundaries_up = defaultdict(set)
         boundaries_down = defaultdict(set)
-
+        
+        # keep flag to check that phone alignement contains silences
+        sil_flag = True
         with open(gold_path, 'r') as fin:
             ali = fin.readlines()
 
@@ -181,6 +145,11 @@ class Gold():
                         '\tfilename onset offset symbol\n'
                         'but alignment contains wrongly formated line:\n'
                         '{}'.format(line))
+
+                if symbol_type == "word" and symbol == "SIL":
+                    continue
+                elif symbol_type == "phone" and symbol == "SIL":
+                    sil_flag = True
                 transcription[(fname, float(on), float(off))] = symbol
                 symbols.add(symbol)
                 intervals[fname].append((float(on), float(off), symbol))
@@ -192,6 +161,11 @@ class Gold():
                 gold[fname] = intervaltree.IntervalTree.from_tuples(
                     intervals[fname])
 
+        # raise warning if phone alignment doesn't contain silences
+        if symbol_type == "phone" and not sil_flag:
+            raise UserWarning("phone alignment does not contain"
+                    " silences, which are necessary for correct"
+                    " evaluation.")
         # create a mapping index -> symbols for the phones
         symbol2ix = {v: k for k, v in enumerate(list(symbols))}
         ix2symbols = dict((v, k) for k, v in symbol2ix.items())
