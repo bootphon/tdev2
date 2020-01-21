@@ -17,9 +17,11 @@ class Boundary(Measure):
 
         # get all discovered boundaries
         bounds_down = [(fname, ngram[0][0])
-                       for fname, _, _, ngram, _ in disc.intervals]
+                       for fname, _, _, ngram, _ in disc.intervals
+                       if len(ngram) > 0]
         bounds_up = [(fname, ngram[-1][1])
-                     for fname, _, _, ngram, _ in disc.intervals]
+                     for fname, _, _, ngram, _ in disc.intervals
+                     if len(ngram) > 0]
         self.disc_down = set(bounds_down)
         self.disc_up = set(bounds_up)
 

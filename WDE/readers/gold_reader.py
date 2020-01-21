@@ -146,6 +146,11 @@ class Gold():
                         'but alignment contains wrongly formated line:\n'
                         '{}'.format(line))
 
+                # check timestamps are in correct order
+                assert float(off) > float(on), ("timestamps are not"
+                        " correct\n {}".format(line))
+
+                # If word alignement, don't keep silences, else, keep them.
                 if symbol_type == "word" and symbol == "SIL":
                     continue
                 elif symbol_type == "phone" and symbol == "SIL":

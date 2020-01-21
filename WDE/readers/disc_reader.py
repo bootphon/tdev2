@@ -92,6 +92,10 @@ class Disc():
                     fname, start, end = line.split(' ')
                     disc_on, disc_off = float(start), float(end)
 
+                    # check that timestamps are correct
+                    assert disc_off > disc_on, ("timestamps are not"
+                     " correct\n {} {} {}\n".format(fname, disc_on, disc_off))
+
                     # get the phone transcription for current interval
                     if self.gold_phn:
                         token_ngram, ngram = (self.get_transcription(
@@ -147,6 +151,7 @@ class Disc():
         keep_first = check_boundary(
             (covered[0][0], covered[0][1]),
             (disc_on, covered[0][1]))
+
         keep_last = check_boundary(
             (covered[-1][0], covered[-1][1]),
             (covered[-1][0], disc_off))

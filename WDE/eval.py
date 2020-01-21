@@ -57,10 +57,12 @@ def main():
     phn_path = pkg_resources.resource_filename(
             pkg_resources.Requirement.parse('WDE'),
             'WDE/share/{}.phn'.format(args.corpus))
-  
+ 
+    print('Reading gold')
     gold = Gold(wrd_path=wrd_path, 
-                phn_path=phn_path) 
+                phn_path=phn_path)
 
+    print('Reading discovered classes')
     disc = Disc(args.disc_clsfile, gold) 
 
     measures = args.measures
@@ -69,22 +71,27 @@ def main():
     # Launch evaluation of each metric and write it 
     # in the output
     if len(measures) == 0 or "boundary" in measures:
+        print('Computing Boundary...')
         boundary = Boundary(gold, disc, output)
         boundary.compute_boundary()
         boundary.write_score()
     if len(measures) == 0 or "grouping" in measures:
+        print('Computing Grouping...')
         grouping = Grouping(disc, output)
         grouping.compute_grouping()
         grouping.write_score()
     if len(measures) == 0 or "token/type" in measures:
+        print('Computing Token and Type...')
         token_type = TokenType(gold, disc, output)
         token_type.compute_token_type()
         token_type.write_score()
     if len(measures) == 0 or "coverage" in measures:
+        print('Computing Coverage...')
         coverage = Coverage(gold, disc, output)
         coverage.compute_coverage()
         coverage.write_score()
     if len(measures) == 0 or "ned" in measures:
+        print('Computing NED...')
         ned = Ned(disc, output)
         ned.compute_ned()
         ned.write_score()
