@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import time
 import argparse
 import pkg_resources 
 
@@ -34,6 +35,10 @@ def main():
     ...
     """)
     parser.add_argument('disc_clsfile', metavar='discovered', type=str)
+    parser.add_argument('corpus', metavar='language', type=str, 
+                        choices=['buckeye', 'english', 'french',
+                                 'mandarin'],
+                        help='Choose the corpus you want to evaluate')
     parser.add_argument('--measures', '-m',
                         nargs='*',
                         default=[],
@@ -44,13 +49,15 @@ def main():
                         help="path in which to write the output")
 
     args = parser.parse_args()
+
+    # load the corpus alignments
     wrd_path = pkg_resources.resource_filename(
             pkg_resources.Requirement.parse('WDE'),
-            'WDE/share/english.wrd')
+            'WDE/share/{}.wrd'.format(args.corpus))
     phn_path = pkg_resources.resource_filename(
             pkg_resources.Requirement.parse('WDE'),
-            'WDE/share/english.phn')
-   
+            'WDE/share/{}.phn'.format(args.corpus))
+  
     gold = Gold(wrd_path=wrd_path, 
                 phn_path=phn_path) 
 
@@ -58,6 +65,9 @@ def main():
 
     measures = args.measures
     output = args.output
+
+    # Launch evaluation of each metric and write it 
+    # in the output
     if len(measures) == 0 or "boundary" in measures:
         boundary = Boundary(gold, disc, output)
         boundary.compute_boundary()

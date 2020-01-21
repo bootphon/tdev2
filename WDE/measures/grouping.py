@@ -121,8 +121,6 @@ class Grouping(Measure):
                 counter.update((f2[4],))
                 seen_token.add(f2[3])
 
-        print(seen_token)
-
         # weights = {ngram: 1/counter[ngram] for ngram in counter}
         weights = {ngram: counter[ngram]/len(seen_token) for ngram in counter}
         return weights, counter
