@@ -9,10 +9,10 @@ from WDE.readers.disc_reader import Disc
 def gold():
     wrd_path = pkg_resources.resource_filename(
             pkg_resources.Requirement.parse('WDE'),
-            'WDE/share/english.wrd')
+            'WDE/share/buckeye.wrd')
     phn_path = pkg_resources.resource_filename(
             pkg_resources.Requirement.parse('WDE'),
-            'WDE/share/english.phn')
+            'WDE/share/buckeye.phn')
 
     return Gold(wrd_path=wrd_path,
                 phn_path=phn_path)
@@ -22,13 +22,13 @@ def gold():
 def gold_vad():
     wrd_path = pkg_resources.resource_filename(
             pkg_resources.Requirement.parse('WDE'),
-            'WDE/share/english.wrd')
+            'WDE/share/buckeye.wrd')
     phn_path = pkg_resources.resource_filename(
             pkg_resources.Requirement.parse('WDE'),
-            'WDE/share/english.phn')
+            'WDE/share/buckeye.phn')
     vad_path = pkg_resources.resource_filename(
             pkg_resources.Requirement.parse('WDE'),
-            'WDE/share/english.vad')
+            'WDE/share/buckeye.vad')
 
     return Gold(wrd_path=wrd_path,
                 phn_path=phn_path,
@@ -38,10 +38,10 @@ def gold_vad():
 def mandarin_gold():
     wrd_path = pkg_resources.resource_filename(
             pkg_resources.Requirement.parse('WDE'),
-            'WDE/share/ZR17/mandarin.wrd')
+            'WDE/share/mandarin.wrd')
     phn_path = pkg_resources.resource_filename(
             pkg_resources.Requirement.parse('WDE'),
-            'WDE/share/ZR17/mandarin.phn')
+            'WDE/share/mandarin.phn')
 
     return Gold(wrd_path=wrd_path,
                 phn_path=phn_path)
