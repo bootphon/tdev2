@@ -1,0 +1,12 @@
+name: TDE
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.6
+  - numpy>=1.8.1
+  - pandas>=0.13.1
+  - pip
+  - intervaltree
+  - editdistance
+  - pytest>=2.6
+  - setuptools

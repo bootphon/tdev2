@@ -14,9 +14,6 @@
                    ov=1.0)
 """
 
-import ipdb
-
-
 def check_boundary(gold_times, disc_times):
     """ Consider phone discovered if the found interval overlaps
         with either more thant 50% or more than 30ms of the
@@ -45,14 +42,6 @@ def check_boundary(gold_times, disc_times):
     elif ((gold_dur >= 0.060 and ov_time < 0.030) or
           (gold_dur < 0.060 and ov < 0.5)):
         return False
-    else:
-        ipdb.set_trace()
-
-    # if (ov_time >= 0.030):
-    #     return True
-    # elif (ov_time < 0.030) :
-    #     return False
-
 
 def overlap(disc, gold):
     ov = (min(disc[1], gold[1]) - max(disc[0], gold[0])) \
