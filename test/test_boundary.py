@@ -1,5 +1,5 @@
 from collections import defaultdict
-from WDE.measures.boundary import Boundary
+from tdev2.measures.boundary import Boundary
 
 
 def test_boundaries(gold):

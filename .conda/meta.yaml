@@ -1,0 +1,53 @@
+# Build the shennong conda package. Run with "conda build . -c coml"
+
+{% set name = 'tde' %}
+{% set data = load_setup_py_data() %}
+
+package:
+  name: {{ name }}
+  version: {{ data.get('version') }}
+
+source:
+  path: ..
+
+build:
+  script:
+    - python setup.py build
+    - python setup.py install
+
+requirements:
+    build:
+      - intervaltree
+      - editdistance
+      - python {{ python }}
+      - numpy
+      - pandas
+      - pip
+      - pytest
+      - setuptools
+
+    run:
+      - intervaltree
+      - editdistance
+      - python {{ python }}
+      - numpy
+      - pandas
+      - pip
+      - pytest
+      - setuptools
+
+test:
+  imports:
+    - tdev2
+  requires:
+    - pytest>=2.6
+  source_files:
+    - test
+  commands:
+    - pytest -vx
+
+about:
+  home: {{ data.get('url') }}
+  license: {{ data.get('license') }}
+  summary: {{ data.get('description') }}
+

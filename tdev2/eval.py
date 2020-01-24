@@ -3,13 +3,13 @@ import time
 import argparse
 import pkg_resources 
 
-from WDE.measures.ned import *
-from WDE.measures.boundary import *
-from WDE.measures.grouping import *
-from WDE.measures.coverage import *
-from WDE.measures.token_type import *
-from WDE.readers.gold_reader import *
-from WDE.readers.disc_reader import *
+from tdev2.measures.ned import *
+from tdev2.measures.boundary import *
+from tdev2.measures.grouping import *
+from tdev2.measures.coverage import *
+from tdev2.measures.token_type import *
+from tdev2.readers.gold_reader import *
+from tdev2.readers.disc_reader import *
 
 def main():
     parser = argparse.ArgumentParser(
@@ -52,11 +52,11 @@ def main():
 
     # load the corpus alignments
     wrd_path = pkg_resources.resource_filename(
-            pkg_resources.Requirement.parse('WDE'),
-            'WDE/share/{}.wrd'.format(args.corpus))
+            pkg_resources.Requirement.parse('tdev2'),
+            'tdev2/share/{}.wrd'.format(args.corpus))
     phn_path = pkg_resources.resource_filename(
-            pkg_resources.Requirement.parse('WDE'),
-            'WDE/share/{}.phn'.format(args.corpus))
+            pkg_resources.Requirement.parse('tdev2'),
+            'tdev2/share/{}.phn'.format(args.corpus))
  
     print('Reading gold')
     gold = Gold(wrd_path=wrd_path, 

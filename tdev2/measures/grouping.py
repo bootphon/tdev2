@@ -3,7 +3,7 @@ import numpy as np
 from .measures import Measure
 from itertools import combinations
 from collections import defaultdict, Counter
-from WDE.utils import overlap
+from tdev2.utils import overlap
 
 
 class Grouping(Measure):

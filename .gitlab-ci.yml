@@ -2,19 +2,19 @@ before_script:
   # load the requested modules on oberon
   - module load anaconda/3 
 
-WDE-build:
+tdev2-build:
   stage: build
   script:
     # create a Python virtual environment dedicated to the test (if not existing)
     - conda env create --file environment.yml 2> /dev/null || true
     - conda activate TDE
 
-    # install WDE
+    # install tdev2
     #- pip install coverage intervaltree ipdb numpy pandas editdistance pytest
     - python setup.py build
     - python setup.py install
 
-WDE-test:
+tdev2-test:
   stage: test
   script:
     # run the unit tests within the CI environment

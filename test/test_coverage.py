@@ -1,4 +1,4 @@
-from WDE.measures.coverage import Coverage
+from tdev2.measures.coverage import Coverage
 
 
 def test_gold_coverage(gold, gold_disc):

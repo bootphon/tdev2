@@ -1,4 +1,4 @@
-from WDE.measures.ned import Ned
+from tdev2.measures.ned import Ned
 
 
 def test_gold_pairs(gold, gold_disc_pairs):

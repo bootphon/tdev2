@@ -3,29 +3,31 @@
 
 import codecs
 import setuptools
-
+import tdev2
 
 setuptools.setup(
     # general description
-    name='WDE',
-    description='Evaluation toolbox for Word Discovery systems',
+    name='tdev2',
+    description='Evaluation toolbox for Term Discovery systems',
+    version=tdev2.__version__,
+    long_description=open('README.md').read(),
+    url='https://github.com/bootphon/tdev2',
+    license='LICENSE.txt',
 
     # python package dependencies
-    setup_requires=['editdistance',
-                    'intervaltree',
-                    'pandas >= 0.13.1',
-                    'numpy >= 1.8.0',
-                    'pytest-runner'],
-    tests_require=['pytest>=2.6'],
+    setup_requires=['pandas',
+                    'numpy'],
+    install_requires=['editdistance',
+                    'intervaltree'],
+
+    tests_require=['pytest'],
 
     # packages for code and data
     packages=setuptools.find_packages(),
-    package_data={'WDE': ['share/*']},
+    package_data={'tdev2': ['share/*']},
 
     # metadata for upload to PyPI
     author='Julien Karadayi, INRIA',
     author_email='julien.karadayi@inria.fr',
-    license='GPL3',
-    long_description=codecs.open('README.md', encoding='utf-8').read(),
     zip_safe=True,
 )
