@@ -1,11 +1,18 @@
 Term Discovery Evaluation
 =========================
 
-Toolbox to evaluate  Word Discovery systems.
+Toolbox to evaluate  Term Discovery systems.
 
 Implements some of the metrics described in [this paper](https://core.ac.uk/download/pdf/48187287.pdf).
 
-Basic idea: phonetically transcribed each discovered item, then apply NLP evaluations.
+This toolbox transcribed phoneticall each discovered interval, then applies 
+NLP evaluation to judge the quality of the discovery.
+The metrics are:
+- NED : mean of the edit distance between all the discovered pairs
+- coverage: percentage of the corpus covered
+- token/type: measure how good the system was at finding gold tokens and gold types
+- boundary: measure how good the system was at finding gold boundaries
+- grouping: judge the purity of the clusters formed by the system
 
 Installation
 ------------
@@ -25,40 +32,32 @@ python setup.py build && python setup.py install
 How To Use
 ----------
 
-First, you need to read the alignments and the discovered classes first
-
-```python
-from WDE.readers.disc_reader import * 
-from WDE.readers.gold_reader import *  
-from WDE.measures.boundary import * 
-import pkg_resources 
-
-# get paths to alignments / discovered classes
-wrd_path = pkg_resources.resource_filename( 
-pkg_resources.Requirement.parse('WDE'), 
-            'WDE/share/english.wrd') 
-phn_path = pkg_resources.resource_filename( 
- pkg_resources.Requirement.parse('WDE'), 
- 'WDE/share/english.phn') 
-pairs_path = pkg_resources.resource_filename( 
- pkg_resources.Requirement.parse('WDE'),
- "WDE/share/group_clusters.class" )
-
-# read alignments
-gold = Gold(wrd_path=wrd_path, 
-phn_path=phn_path) 
-
-# read discovered
-discovered = Disc(pairs_path, gold) 
-```
-
-then you can compute the measures using the eval.py script
+The discovered intervals should be in the following format:
 
 ```bash
-python eval.py discovered_class output/
+    Class 1:
+    wav1 on1 off1
+    wav2 on2 off2
+
+    Class 2:
+    wav1 on3 off3
+    wav3 on4 off4
+
 ```
 
-or using the python API
+and finish by an empty line (which is important).
+
+You can compute the measures using the eval.py script
+
+```bash
+python eval.py discovered_class corpus output/
+```
+
+where corpus is the corpus you want to evaluate (currently supporting ['english'
+, 'french', 'mandarin', 'buckeye'], where the first three are the corpora of the
+ZeroSpeech 2017 challenge).
+
+You can also use the python API
 
 ```python
 import pkg_resources 
