@@ -22,9 +22,6 @@ requirements:
       - python {{ python }}
       - numpy
       - pandas
-      - pip
-      - pytest
-      - setuptools
 
     run:
       - intervaltree
@@ -32,9 +29,6 @@ requirements:
       - python {{ python }}
       - numpy
       - pandas
-      - pip
-      - pytest
-      - setuptools
 
 test:
   imports:
