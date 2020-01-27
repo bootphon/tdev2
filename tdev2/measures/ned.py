@@ -17,7 +17,10 @@ class Ned(Measure):
 
     @staticmethod
     def pairwise_ned(s1, s2):
-        return float(editdistance.eval(s1, s2)) / max(len(s1), len(s2))
+        if max(len(s1), len(s2)) > 0:
+            return float(editdistance.eval(s1, s2)) / max(len(s1), len(s2))
+        else:
+            return 1.0
 
     def compute_ned(self):
         """ compute edit distance over all discovered pairs and average across
