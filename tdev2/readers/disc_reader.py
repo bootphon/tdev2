@@ -100,6 +100,10 @@ class Disc():
                     if self.gold_phn:
                         token_ngram, ngram = (self.get_transcription(
                          fname, disc_on, disc_off, self.gold_phn))
+
+                        # throw away interval if outside of transcription
+                        if len(token_ngram) == 0:
+                            continue
                     else:
                         print("Warning: discovered file was read"
                               " without gold, so no transcription is read")
@@ -146,6 +150,11 @@ class Disc():
             [phn for phn
              in gold_phn[fname].overlap(disc_on, disc_off)],
             key=lambda times: times[0])
+
+        if len(covered) == 0:
+            print('Warning: interval {} {} {} if outside of transcription\n')
+            print('Will not use it in evaluation')
+            return tuple(), tuple()
 
         # Check if first and last phones are discovered
         keep_first = check_boundary(
