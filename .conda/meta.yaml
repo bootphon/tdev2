@@ -1,4 +1,4 @@
-# Build the shennong conda package. Run with "conda build . -c coml"
+# Build the tde conda package. Run with "conda build . -c conda-forge"
 
 {% set name = 'tde' %}
 {% set data = load_setup_py_data() %}
@@ -44,4 +44,3 @@ about:
   home: {{ data.get('url') }}
   license: {{ data.get('license') }}
   summary: {{ data.get('description') }}
-
