@@ -1,7 +1,6 @@
 import os
 import numpy as np
 import editdistance
-
 from .measures import Measure
 from itertools import combinations
 
@@ -13,10 +12,13 @@ class Ned(Measure):
         self.disc = disc.clusters
 
         # measures
+        self.n_pairs = None
         self.ned = None
 
     @staticmethod
     def pairwise_ned(s1, s2):
+        s1 = tuple(phn for phn in s1 if phn != "SIL")
+        s2 = tuple(phn for phn in s2 if phn != "SIL")
         if max(len(s1), len(s2)) > 0:
             return float(editdistance.eval(s1, s2)) / max(len(s1), len(s2))
         else:
@@ -34,15 +36,16 @@ class Ned(Measure):
             :param ned:   the average edit distance of all the pairs
         """
         overall_ned = []
-
         for class_nb in self.disc:
             for discovered1, discovered2 in combinations(
                     self.disc[class_nb], 2):
                 fname1, disc_on1, disc_off1, token_ngram1, ngram1 = discovered1
                 fname2, disc_on2, disc_off2, token_ngram2, ngram2 = discovered2
-
                 pair_ned = self.pairwise_ned(ngram1, ngram2)
                 overall_ned.append(pair_ned)
+
+        # get number of pairs and ned value
+        self.n_pairs = len(overall_ned)
         self.ned = np.mean(overall_ned)
 
     def write_score(self):

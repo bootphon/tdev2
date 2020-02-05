@@ -41,30 +41,16 @@ class Disc():
         if gold:
             self.gold_phn = gold.phones
         else:
+            print("Warning: discovered file is read"
+                  " without gold, so no transcription is given")
             self.gold_phn = None
-        # self.transcription = None
         self.intervals_tree = None
-        # set intervals
         self.read_clusters()
 
     def __repr__(self):
         return '\n'.join(
            '{} {} {}'.format(fname, t0, t1)
            for (fname, t0, t1) in self.intervals)
-
-    # def get_interval_transcription(self, fname, on, off):
-    #    """ Return the transcription of an interval """
-
-    #    #if (fname, on, off) not in self.intervals:
-    #    #    raise ValueError('Requested interval not in discovered intervals')
-    #    interval_trs = [ngram for fn, disc_on, disc_on, token_ngram, ngram
-    #                          in self.intervals
-    #                          if (fn == fname and disc_on == on
-    #                              and disc_off == off)]
-    #    if len(interval_trs) == 0:
-    #        raise ValueError('Requested interval not in discovered intervals')
-
-    #    return ' '.join(interval_trs)
 
     def read_clusters(self):
         """ Read discovered clusters """
@@ -105,8 +91,6 @@ class Disc():
                         if len(token_ngram) == 0:
                             continue
                     else:
-                        print("Warning: discovered file was read"
-                              " without gold, so no transcription is read")
                         token_ngram, ngram = None, None
 
                     intervals.add(
@@ -120,8 +104,10 @@ class Disc():
                     assert class_number not in discovered, (
                         "Two Classes have the same number {}"
                         " in discovered classes".format(class_number))
-                    assert len(classes) > 0, ('class {} if empty')
-                    discovered[class_number] = classes
+                    #assert len(classes) > 0, (
+                    #        'class {} if empty'.format(class_number))
+                    if len(classes) > 0:
+                        discovered[class_number] = classes
 
                     # re-initialize classes
                     classes = list()
@@ -152,8 +138,6 @@ class Disc():
             key=lambda times: times[0])
 
         if len(covered) == 0:
-            print('Warning: interval {} {} {} if outside of transcription\n')
-            print('Will not use it in evaluation')
             return tuple(), tuple()
 
         # Check if first and last phones are discovered
