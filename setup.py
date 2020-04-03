@@ -18,6 +18,7 @@ setuptools.setup(
     setup_requires=['pandas',
                     'numpy'],
     install_requires=['editdistance',
+                      'joblib',
                     'intervaltree'],
 
     tests_require=['pytest'],
