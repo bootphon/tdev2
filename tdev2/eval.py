@@ -45,6 +45,10 @@ def main():
                         choices=['boundary', 'grouping', 
                                  'token/type', 'coverage',
                                  'ned'])
+    parser.add_argument('--njobs', '-n',
+                        default=1,
+                        type=int,
+                        help="number of cpus to be used in grouping")
     parser.add_argument('output', type=str,
                         help="path in which to write the output")
 
@@ -77,7 +81,7 @@ def main():
         boundary.write_score()
     if len(measures) == 0 or "grouping" in measures:
         print('Computing Grouping...')
-        grouping = Grouping(disc, output)
+        grouping = Grouping(disc, output, args.njobs)
         grouping.compute_grouping()
         grouping.write_score()
     if len(measures) == 0 or "token/type" in measures:
