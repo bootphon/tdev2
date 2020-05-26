@@ -141,13 +141,21 @@ class Disc():
             return tuple(), tuple()
 
         # Check if first and last phones are discovered
+        #keep_first = check_boundary(
+        #    (covered[0][0], covered[0][1]),
+        #    (disc_on, covered[0][1]))
+
+        #keep_last = check_boundary(
+        #    (covered[-1][0], covered[-1][1]),
+        #    (covered[-1][0], disc_off))
+
         keep_first = check_boundary(
             (covered[0][0], covered[0][1]),
-            (disc_on, covered[0][1]))
+            (disc_on, disc_off))
 
         keep_last = check_boundary(
             (covered[-1][0], covered[-1][1]),
-            (covered[-1][0], disc_off))
+            (disc_on, disc_off))
 
         if keep_first:
             token_ngram = [

@@ -47,3 +47,10 @@ def test_50percent(disc, gold):
         'should not have found last phone because took less than 50% of it')
     assert ngram_good == ('ah', 'n'), (
         'should have found last phone because took more thant 50% of it')
+
+def test_tiny_interval(disc, gold):
+    token_ngram, ngram = disc.get_transcription(
+        's0101a', 77.276, 77.278 , gold.phones)
+    assert len(ngram) == 0, (
+        'Discovered transcription should be empty, but '
+        'found {} as transcription'.format(ngram))
