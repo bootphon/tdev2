@@ -8,6 +8,23 @@ from tdev2.utils import overlap
 
 
 class Grouping(Measure):
+    """Grouping measure
+    
+    The grouping measures how pure the found clusters are, and
+    is close to the 'purity' measure in clustering.
+    See http://zerospeech.com/2015/track_2.html for a summary of 
+    all measures.
+
+    Input
+    :param disc: Discovered Object, contains the discovered elements
+    :param output_folder: string, path to the output folder
+    :param njobs: Number of cpus to be used.
+
+    Output
+    :param precision: Grouping Precision
+    :param recall: Grouping Recall
+
+    """
     def __init__(self, disc, output_folder=None, njobs=1):
         self.metric_name = "grouping"
         self.output_folder = output_folder

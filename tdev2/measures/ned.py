@@ -6,6 +6,23 @@ from itertools import combinations
 
 
 class Ned(Measure):
+    """NED measure
+    
+    The NED (Normalized Edit Distance) measures how close each 
+    pair of word found is. For 1 pair of intervals found, a 
+    NED of 1 means all the phonemes are different, and a NED of 0 means
+    they contain the exact same phonemes in the same order.
+    See http://zerospeech.com/2015/track_2.html for a summary of 
+    all measures.
+
+    Input
+    :param disc: Discovered Object, contains the discovered phonemes
+    :param output_folder: string, path to the output folder
+
+    Output
+    :param coverage: NED
+    """
+
     def __init__(self, disc, output_folder=None):
         self.metric_name = "ned"
         self.output_folder = output_folder

@@ -6,6 +6,28 @@ from tdev2.utils import overlap
 
 
 class TokenType(Measure):
+    """Token Type measure
+    
+    The Token measures how many 'Gold' token were found.
+    The Type measures how many 'Gold' type were found.
+    A 'Type' is a word type, and a 'token' is a specific occurence
+    of a 'type'.
+    See http://zerospeech.com/2015/track_2.html for a summary of 
+    all measures.
+
+    Input
+    :param disc: Discovered Object, contains the discovered boundaries
+    :param gold: Gold object, contains all the gold boundaries
+    :param output_folder: string, path to the output folder
+
+    Output
+    :param token_precision: Token Precision
+    :param token_recall: Token Recall
+    :param type_precision: Type Precision
+    :param type_recall: Type Recall
+
+    """
+
     def __init__(self, gold, disc, output_folder=None):
         self.metric_name = "token_type"
         self.output_folder = output_folder

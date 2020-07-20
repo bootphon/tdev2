@@ -4,6 +4,21 @@ from .measures import Measure
 
 
 class Coverage(Measure):
+    """Coverage measure
+    
+    The coverage measures how many 'Gold' phonemes were found.
+    See http://zerospeech.com/2015/track_2.html for a summary of 
+    all measures.
+
+    Input
+    :param disc: Discovered Object, contains the discovered phonemes
+    :param gold: Gold object, contains all the gold phonemes
+    :param output_folder: string, path to the output folder
+
+    Output
+    :param coverage: Coverage
+    """
+
     def __init__(self, gold, disc, output_folder=None):
         self.metric_name = "coverage"
         self.output_folder = output_folder

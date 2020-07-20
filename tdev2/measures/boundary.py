@@ -3,6 +3,22 @@ from .measures import Measure
 
 
 class Boundary(Measure):
+    """Boundary measure
+    
+    The boundary measures how many 'Gold' boundaries were found.
+    See http://zerospeech.com/2015/track_2.html for a summary of 
+    all measures.
+
+    Input
+    :param disc: Discovered Object, contains the discovered boundaries
+    :param gold: Gold object, contains all the gold boundaries
+    :param output_folder: string, path to the output folder
+
+    Output
+    :param precision: Boundary Precision
+    :param recall: Boundary Recall
+    """
+
     def __init__(self, gold, disc, output_folder=None):
         self.metric_name = "boundary"
         self.output_folder = output_folder
