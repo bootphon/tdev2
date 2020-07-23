@@ -106,18 +106,28 @@ class Gold():
         After that, take each found interval, search for its overlaps
         (O( log(n) + m), m being the number of results found),
         and check if we want to keep each interval.
-        INPUT
-        =====
+
+        Parameters
+        ----------
         - gold : the path to the gold alignment
         - symbol_type: string, "word" or "phone",
                        if "word", don't  keep the silences if some are found
                        if "phone", keep them and raise warning if none are found
-        OUTPUT
-        ======
+        Returns
+        -------
         - gold: a dict {fname: intervaltree} which returns the interval tree
                 of the gold phones for each file
         - ix2symbols: a dict that returns the symbols for each index of encoding
                       (to compute the ned, we assign numbers to symbols)
+
+        Raises
+        ------
+        ValueError
+            - If the alignement is not well formated
+        UserWarning
+            - If the phone alignement does not contain silences
+        AssertionError
+            - If an interval contains an offset lower than the onset
         '''
         if not os.path.isfile(gold_path):
             raise ValueError('{}: File Not Found'.format(gold_path))
@@ -130,7 +140,7 @@ class Gold():
         transcription = dict() # create dict that returns the transcription for an interval
         boundaries_up = defaultdict(set)
         boundaries_down = defaultdict(set)
-        
+
         # keep flag to check that phone alignement contains silences
         sil_flag = True
         with open(gold_path, 'r') as fin:
@@ -184,6 +194,14 @@ class Gold():
         This is done using intervaltree.search, which is supposed to
         work in O(log(n) + m), n being the number of intervals and m
         the number of covered intervals.
+
+        Parameters
+        ----------
+        fname: str, name of the speaker
+        on: float, onset of the interval
+        off: float, offset of the interval
+        gold: dict of intervaltree, contains all gold phones
+        transcription: dict of tuples, contains the transcription of each interval
         """
         def overlap(a, b, interval):
             ov = (min(b, interval[1]) - max(a, interval[0])) \

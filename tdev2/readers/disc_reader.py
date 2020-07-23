@@ -31,6 +31,27 @@ from tdev2.utils import check_boundary
 
 
 class Disc():
+    """ Read the discovered intervals
+
+    Attributes
+    ----------
+    :param disc_path: Path to the 'Discovered" file, to be evaluated
+    :param intervals: a list of all the discovered intervals
+    :param intervals_tree: an interval tree containing all the discovered 
+                           intervals
+    :param clusters: a dictionary where all the keys are class numbers, and the
+        values are all the intervals for that class
+
+
+    Raises
+    ------
+    AssertionError 
+        - if incorrect interval found (offset greater than onset)
+        - if two classes have the same class number
+    ValueError
+        - if discovered file is not found
+        - if discovered file is is wrong format
+    """
     def __init__(self, disc_path=None, gold=None):
 
         if not os.path.isfile(disc_path):
@@ -53,7 +74,26 @@ class Disc():
            for (fname, t0, t1) in self.intervals)
 
     def read_clusters(self):
-        """ Read discovered clusters """
+        """ Read discovered clusters
+        
+        Returns a dictionnary { class_number : [intervals_found]} that gives
+        a list of the intervals for each class_number as key.
+        The intervals are represented as a tuple:
+            (fname: str, name of the speaker
+            disc_on: float, onset of the interval
+            disc_off: float, offset of the interval
+            token_ngram: tuple, each discovered phone from the interval, with 
+                         their onset and offsets,
+            ngram: tuple, each)
+
+        Raises
+        ------
+        AssertionError 
+            - if incorrect interval found (offset greater than onset)
+            - if two classes have the same class number
+        ValueError
+            - if a line is badly formated
+        """
         classes = []
         discovered = dict()
         intervals = set()
@@ -130,7 +170,21 @@ class Disc():
 
     @staticmethod
     def get_transcription(fname, disc_on, disc_off, gold_phn):
-        """ Given an interval, get its phone transcription"""
+        """ Given an interval, get its phone transcription
+
+        Parameters
+        ----------
+        fname: str, name of the speaker on the interval
+        disc_on: float, onset of the interval
+        disc_off: float, offset of the interval
+        gold_phn: intervaltree, contains the gold phones
+
+        Returns
+        -------
+        token_ngram: list of tuples, list of all the 
+                     (onset, offset, phone) covered by request interval
+        ngram:       list, list of all the phones covered by request interval
+        """
         # Get all covered phones
         covered = sorted(
             [phn for phn
