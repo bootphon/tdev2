@@ -1,9 +1,6 @@
 [![Anaconda-Server Badge](https://anaconda.org/coml/tde/badges/version.svg)](
 https://anaconda.org/coml/tde)
 
-
-https://anaconda.org/coml/tde/badges/version.svg
-
 Term Discovery Evaluation
 =========================
 
@@ -67,14 +64,14 @@ You can also use the python API
 
 ```python
 import pkg_resources 
-from WDE.readers.gold_reader import *
-from WDE.readers.disc_reader import *
+from tde.readers.gold_reader import *
+from tde.readers.disc_reader import *
 wrd_path = pkg_resources.resource_filename(
-            pkg_resources.Requirement.parse('WDE'),
-            'WDE/share/mandarin.wrd')
+            pkg_resources.Requirement.parse('tde'),
+            'tde/share/mandarin.wrd')
 phn_path = pkg_resources.resource_filename(
-            pkg_resources.Requirement.parse('WDE'),
-            'WDE/share/mandarin.phn')
+            pkg_resources.Requirement.parse('tde'),
+            'tde/share/mandarin.phn')
 
 gold = Gold(wrd_path=wrd_path, 
                 phn_path=phn_path) 
@@ -83,7 +80,7 @@ disc_clsfile = "/path/to/discovered/file"
 
 disc = Disc(disc_clsfile, gold) 
 
-from WDE.measures.grouping import * 
+from tde.measures.grouping import * 
 grouping = Grouping(discovered)
 grouping.compute_grouping()
 

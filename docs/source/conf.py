@@ -15,11 +15,11 @@
 # sys.path.insert(0, os.path.abspath('.'))
 
 import datetime
-import tdev2
+import tde
 
 # -- Project information -----------------------------------------------------
 
-project = 'TDE v2'
+project = 'TDE'
 copyright = '2020, CoML Team'
 author = 'CoML Team'
 

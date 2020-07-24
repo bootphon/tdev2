@@ -3,7 +3,7 @@
 Token Type Measures
 ~~~~~~~~~~~~~~~~~~~
 
-.. automodule:: tdev2.measures.token_type
+.. automodule:: tde.measures.token_type
     :members:
     :inherited-members:
     :undoc-members:

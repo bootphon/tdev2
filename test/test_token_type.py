@@ -1,7 +1,7 @@
 import pytest
 import intervaltree
 
-from tdev2.measures.token_type import TokenType
+from tde.measures.token_type import TokenType
 
 
 def test_TokenType_init(gold, disc):

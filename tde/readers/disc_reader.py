@@ -27,7 +27,7 @@ import os
 import codecs
 import intervaltree
 
-from tdev2.utils import check_boundary
+from tde.utils import check_boundary
 
 
 class Disc():

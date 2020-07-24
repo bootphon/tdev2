@@ -4,7 +4,7 @@ from joblib import Parallel, delayed
 from .measures import Measure
 from itertools import combinations
 from collections import defaultdict, Counter
-from tdev2.utils import overlap
+from tde.utils import overlap
 
 
 class Grouping(Measure):

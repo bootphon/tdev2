@@ -3,7 +3,7 @@
 Boundary Measure
 ~~~~~~~~~~~~~~~~
 
-.. automodule:: tdev2.measures.boundary
+.. automodule:: tde.measures.boundary
     :members:
     :inherited-members:
     :undoc-members:

@@ -1,4 +1,4 @@
-from tdev2.measures.grouping import Grouping
+from tde.measures.grouping import Grouping
 
 
 def test_same_pairs_and_class(disc_clusters, disc_pairs):

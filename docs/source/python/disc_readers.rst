@@ -3,7 +3,7 @@
 Discovered Data Readers
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-.. automodule:: tdev2.readers.disc_reader
+.. automodule:: tde.readers.disc_reader
     :members:
     :inherited-members:
     :undoc-members:

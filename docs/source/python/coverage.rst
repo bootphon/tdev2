@@ -3,7 +3,7 @@
 Coverage Measure
 ~~~~~~~~~~~~~~~~
 
-.. automodule:: tdev2.measures.coverage
+.. automodule:: tde.measures.coverage
     :members:
     :inherited-members:
     :undoc-members:

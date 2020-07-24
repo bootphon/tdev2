@@ -3,15 +3,15 @@
 
 import codecs
 import setuptools
-import tdev2
+import tde
 
 setuptools.setup(
     # general description
-    name='tdev2',
+    name='tde',
     description='Evaluation toolbox for Term Discovery systems',
-    version=tdev2.__version__,
+    version=tde.__version__,
     long_description=open('README.md').read(),
-    url='https://github.com/bootphon/tdev2',
+    url='https://github.com/bootphon/tde',
     license='LICENSE.txt',
 
     # python package dependencies
@@ -25,7 +25,7 @@ setuptools.setup(
 
     # packages for code and data
     packages=setuptools.find_packages(),
-    package_data={'tdev2': ['share/*']},
+    package_data={'tde': ['share/*']},
 
     # metadata for upload to PyPI
     author='Julien Karadayi, INRIA',

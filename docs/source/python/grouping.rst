@@ -3,7 +3,7 @@
 Grouping Measure
 ~~~~~~~~~~~~~~~~
 
-.. automodule:: tdev2.measures.grouping
+.. automodule:: tde.measures.grouping
     :members:
     :inherited-members:
     :undoc-members:

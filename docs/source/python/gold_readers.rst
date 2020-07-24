@@ -3,7 +3,7 @@
 Gold Data Readers
 ~~~~~~~~~~~~~~~~~
 
-.. automodule:: tdev2.readers.gold_reader
+.. automodule:: tde.readers.gold_reader
     :members:
     :inherited-members:
     :undoc-members:

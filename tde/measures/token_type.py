@@ -2,7 +2,7 @@ import os
 import numpy as np
 
 from .measures import Measure
-from tdev2.utils import overlap
+from tde.utils import overlap
 
 
 class TokenType(Measure):

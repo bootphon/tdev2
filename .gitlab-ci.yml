@@ -9,7 +9,7 @@ tdev2-build:
     - conda env create --file environment.yml 2> /dev/null || true
     - conda activate TDE
 
-    # install tdev2
+    # install tde
     #- pip install coverage intervaltree ipdb numpy pandas editdistance pytest
     - python setup.py build
     - python setup.py install
