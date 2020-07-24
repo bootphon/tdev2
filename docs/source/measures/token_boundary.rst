@@ -1,7 +1,7 @@
-.. _token_type:
+.. _token_boundary:
 
-Token Type Measures
-~~~~~~~~~~~~~~~~~~~
+Token and Boundary Measures
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Parsing quality is evaluated using two metrics. The first one (Token
 precision, recall and F-score) evaluates how many of the word tokens
@@ -19,6 +19,18 @@ diagnostic.
    \textrm{Token recall} &= \frac{|F_{disc}\cap F_{goldLex}|}{|F_{goldLex}|} \\
    \textrm{Boundary precision} &= \frac{|B_{disc}\cap B_{gold}|}{|B_{disc}|} \\
    \textrm{Boundary recall} &= \frac{|B_{disc}\cap B_{gold}|}{|B_{gold}|}
+
+where
+
+- :math:`F_{disc}`: the set of discovered fragments,
+  :math:`F_{disc} = \{ f | f \in c , c \in C_{disc} \}`
+- :math:`F_{goldLex}`: the set of fragments corresponding to the
+  corpus transcribed at the word level (gold transcription).
+- :math:`B_{disc}`: the set of discovered fragment boundaries
+  (boundaries are defined in terms of *i*, the index of the nearest
+  phoneme boundary in the transcription if it is less than 30ms away,
+  and -1 (wrong boundary) otherwise)
+- :math:`B_{gold}`: the set of boundaries in the parsed corpus.
 
 The details of these metrics are given in the Ludusan et al (2014)
 paper. The only divergence between this paper and the present

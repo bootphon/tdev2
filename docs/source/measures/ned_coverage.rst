@@ -1,7 +1,7 @@
-.. _grouping:
+.. _ned_coverage:
 
-NED Measure
-~~~~~~~~~~~
+NED and Coverage Measure
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 Many spoken term discovery systems incorporate a step whereby
 fragments of speech are realigned and compared. Matching quality

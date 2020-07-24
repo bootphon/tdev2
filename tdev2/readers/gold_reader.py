@@ -22,6 +22,18 @@ class Gold():
         alignments can be stored as interval trees or as dictionnaries. The
         interval tree of the silences can also be stored.
 
+        Attributes
+        ----------
+        :param vad_path: string, path to the vad
+        :param_wrd_path: string, path to the word alignment
+        :param phn_path: string, path to the phone alignment
+        :param boundaries: tuples of two dicts, each dict contains the
+                        database filename as key, and for each file,
+                        contains the onset boundaries and offset boundaries
+        :param phones: a dict {fname: intervaltree} which returns the interval tree
+                of the gold phones for each file
+        :param words: a dict {fname: intervaltree} which returns the interval tree
+                of the gold words for each file
         """
         # paths
         self.vad_path = vad_path

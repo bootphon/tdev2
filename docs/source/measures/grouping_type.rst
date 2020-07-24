@@ -1,7 +1,7 @@
-.. _grouping:
+.. _grouping_type:
 
-Grouping Measure
-~~~~~~~~~~~~~~~~
+Grouping and Type Measures
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Clustering quality is evaluated using two metrics. The first metrics
 (Grouping precision, recall and F-score) computes the intrinsic
@@ -43,4 +43,11 @@ kind of centroid).
    {|\textrm{types}(F_{disc})|} \\
    \textrm{Type recall} &= \frac{|\textrm{types}(F_{disc}) \cap \textrm{types}(F_{goldLex})|}
    {|\textrm{types}(F_{goldLex})|} \\
+
+where
+
+- :math:`F_{disc}`: the set of discovered fragments,
+  :math:`F_{disc} = \{ f | f \in c , c \in C_{disc} \}`
+- :math:`F_{goldLex}`: the set of fragments corresponding to the
+  corpus transcribed at the word level (gold transcription).
 

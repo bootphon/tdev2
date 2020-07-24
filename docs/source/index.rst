@@ -14,14 +14,5 @@ Welcome to the documentation for the TDE package.
    :maxdepth: 2
    :caption: Contents:
 
-    python/index
-    measures/index
-
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   python/index
+   measures/index
