@@ -14,4 +14,4 @@
 # along with WDE. If not, see <http://www.gnu.org/licenses/>.
 """ Word Discovery Evaluation tool"""
 
-__version__ = "0.2"
+__version__ = "2.0.2"

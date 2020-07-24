@@ -1,3 +1,9 @@
+[![Anaconda-Server Badge](https://anaconda.org/coml/tde/badges/version.svg)](
+https://anaconda.org/coml/tde)
+
+
+https://anaconda.org/coml/tde/badges/version.svg
+
 Term Discovery Evaluation
 =========================
 
