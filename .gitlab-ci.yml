@@ -21,3 +21,30 @@ tdev2-test:
     - conda activate TDE
       #- python setup.py test
     - pytest
+
+# Deploy documentation
+documentation:
+  stage: deploy
+  only:
+    refs:
+      - master
+  script:
+    - module load anaconda/3
+    - conda activate TDE
+      #- python setup.py test
+    - sphinx-build docs/source docs/build
+    - scp -r docs/build/* syntheticlearner.net:/var/www/docs.syntheticlearner.net/tde
+
+# deploy on anaconda
+# deploy-conda:
+#  stage: deploy
+#  only:
+#    - tags
+#    - triggers
+#  script:
+#    - module load anaconda/3
+#    - conda activate TDE
+#    - cd .conda
+#    - conda build  -c conda-forge --user coml --token $CONDA_TOKEN --skip-existing .
+#    - conda build purge
+
