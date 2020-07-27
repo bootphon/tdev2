@@ -3,6 +3,9 @@
 Evaluation Metrics
 ~~~~~~~~~~~~~~~~~~
 
+The metrics described in this section come from 
+https://core.ac.uk/download/pdf/48187287.pdf.
+
 Spoken term discovery can be logically broken down into a series of 3
 operations, which can be all evaluated independently (see :ref:`Figure
 1 <term_discovery_2015>`). The first step consists in matching pairs of

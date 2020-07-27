@@ -16,3 +16,4 @@ Welcome to the documentation for the TDE package.
 
    python/index
    measures/index
+   usage/index
