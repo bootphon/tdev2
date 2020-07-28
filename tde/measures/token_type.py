@@ -12,8 +12,8 @@ class TokenType(Measure):
     The Type measures how many 'Gold' type were found.
     A 'Type' is a word type, and a 'token' is a specific occurence
     of a 'type'.
-    See http://zerospeech.com/2015/track_2.html for a summary of 
-    all measures.
+    See https://docs.syntheticlearner.net/tde/measures/index.html
+    for a summary of all measures.
 
     Input
     :param disc: Discovered Object, contains the discovered boundaries

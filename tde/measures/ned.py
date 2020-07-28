@@ -12,8 +12,8 @@ class Ned(Measure):
     pair of word found is. For 1 pair of intervals found, a 
     NED of 1 means all the phonemes are different, and a NED of 0 means
     they contain the exact same phonemes in the same order.
-    See http://zerospeech.com/2015/track_2.html for a summary of 
-    all measures.
+    See https://docs.syntheticlearner.net/tde/measures/index.html 
+    for a summary of all measures.
 
     Input
     :param disc: Discovered Object, contains the discovered phonemes

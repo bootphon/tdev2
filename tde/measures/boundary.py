@@ -6,8 +6,8 @@ class Boundary(Measure):
     """Boundary measure
     
     The boundary measures how many 'Gold' boundaries were found.
-    See http://zerospeech.com/2015/track_2.html for a summary of 
-    all measures.
+    See https://docs.syntheticlearner.net/tde/measures/index.html for
+    a summary of all measures.
 
     Input
     :param disc: Discovered Object, contains the discovered boundaries

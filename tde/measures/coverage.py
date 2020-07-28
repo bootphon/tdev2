@@ -7,8 +7,8 @@ class Coverage(Measure):
     """Coverage measure
     
     The coverage measures how many 'Gold' phonemes were found.
-    See http://zerospeech.com/2015/track_2.html for a summary of 
-    all measures.
+    See https://docs.syntheticlearner.net/tde/measures/index.html
+    for a summary of all measures.
 
     Input
     :param disc: Discovered Object, contains the discovered phonemes
