@@ -56,11 +56,11 @@ def main():
 
     # load the corpus alignments
     wrd_path = pkg_resources.resource_filename(
-            pkg_resources.Requirement.parse('tdev2'),
-            'tdev2/share/{}.wrd'.format(args.corpus))
+            pkg_resources.Requirement.parse('tde'),
+            'tde/share/{}.wrd'.format(args.corpus))
     phn_path = pkg_resources.resource_filename(
-            pkg_resources.Requirement.parse('tdev2'),
-            'tdev2/share/{}.phn'.format(args.corpus))
+            pkg_resources.Requirement.parse('tde'),
+            'tde/share/{}.phn'.format(args.corpus))
  
     print('Reading gold')
     gold = Gold(wrd_path=wrd_path, 
