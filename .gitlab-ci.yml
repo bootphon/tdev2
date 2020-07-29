@@ -8,6 +8,7 @@ tdev2-build:
     # create a Python virtual environment dedicated to the test (if not existing)
     - conda env create --file environment.yml 2> /dev/null || true
     - conda activate TDE
+    - conda install pip
 
     # install tde
     #- pip install coverage intervaltree ipdb numpy pandas editdistance pytest
