@@ -23,7 +23,7 @@ tdev2-test:
       #- python setup.py test
     - pytest
   after_script:
-      - pip install codecov
+      - conda activate TDE
       - codecov
       - bash <(curl -s https://codecov.io/bash) -t f0083c40-8708-4805-9ae8-4511d4fb63ec
 
