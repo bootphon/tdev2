@@ -21,6 +21,10 @@ tdev2-test:
     - conda activate TDE
       #- python setup.py test
     - pytest
+  after_script:
+      - pip install codecov
+      - codecov
+      - bash <(curl -s https://codecov.io/bash) -t f0083c40-8708-4805-9ae8-4511d4fb63ec
 
 # Deploy documentation
 documentation:
@@ -34,9 +38,7 @@ documentation:
       #- python setup.py test
     - sphinx-build docs/source docs/build
     - scp -r docs/build/* syntheticlearner.net:/var/www/docs.syntheticlearner.net/tde
-  after_script:
-      - echo 'sending to codecov'
-      - bash <(curl -s https://codecov.io/bash) -t f0083c40-8708-4805-9ae8-4511d4fb63ec
+
 # deploy on anaconda
 # deploy-conda:
 #  stage: deploy

@@ -13,6 +13,7 @@
                    overlaps the second one, even if the first is bigger,
                    ov=1.0)
 """
+import numpy as np 
 
 def check_boundary(gold_times, disc_times):
     """ Consider phone discovered if the found interval overlaps
@@ -44,7 +45,7 @@ def check_boundary(gold_times, disc_times):
         return False
 
 def overlap(disc, gold):
-    ov = (min(disc[1], gold[1]) - max(disc[0], gold[0])) \
+    ov = (np.min([disc[1], gold[1]]) - np.max([disc[0], gold[0]])) \
         / (gold[1] - gold[0])
-    time = round(min(disc[1], gold[1]) - max(disc[0], gold[0]), 3)
+    time = round(np.min([disc[1], gold[1]]) - np.max([disc[0], gold[0]]), 3)
     return ov, time
