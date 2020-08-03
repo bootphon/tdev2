@@ -1,6 +1,6 @@
 import numpy as np
 
-from joblib import Parallel, delayed
+#from joblib import Parallel, delayed
 from .measures import Measure
 from itertools import combinations
 from collections import defaultdict, Counter
@@ -15,6 +15,14 @@ class Grouping(Measure):
     See https://docs.syntheticlearner.net/tde/measures/index.html
     for a summary of all measures.
 
+    .. note::
+        The grouping computation requires to create the set of all "gold
+        pairs" from the found pairs. This step is in "n choose 2" for each
+        type found and take too much memory and cpu time.
+        To fix this, we convert here all timestamps in seconds (in float),
+        to timestamps in milliseconds (as integers), and manage dictionaries
+        of integers.
+
     Input
     :param disc: Discovered Object, contains the discovered elements
     :param output_folder: string, path to the output folder
@@ -26,10 +34,21 @@ class Grouping(Measure):
 
     """
     def __init__(self, disc, output_folder=None, njobs=1):
+        print('inside grouping')
         self.metric_name = "grouping"
         self.output_folder = output_folder
-        self.clusters = disc.clusters
-        self.intervals = disc.intervals
+        #self.clusters = disc.clusters
+        # set timestamps as int in milliseconds
+        self.clusters = dict()
+        for key in disc.clusters:
+            self.clusters[key] = [(fname, int(disc_on * 1000), int(disc_off * 1000),
+              token_ngram, ngram) for fname, disc_on, disc_off, token_ngram, ngram in disc.clusters[key]]
+
+        self.intervals = list()
+        for fname, disc_on, disc_off, token_ngram, ngram in disc.intervals:
+            self.intervals.append((fname, int(disc_on * 1000), int(disc_off * 1000), token_ngram, ngram))
+
+        #self.intervals = disc.intervals
         self.njobs = njobs
         self.found_pairs = set()
         self.gold_pairs = set()
@@ -54,114 +73,6 @@ class Grouping(Measure):
                       / self.gold_counter[t] for t in self.gold_types)
         return rec
 
-    #def get_gold_pairs(self):
-    #    """ Get all the gold pairs that can be created using the
-    #        discovered intervals.
-    #        The pairs are ordered by filename and onset.
-
-    #        Input
-    #        :param intervals: a list of all the discovered intervals, with
-    #                          their transcription
-    #        Output
-    #        :param gold_pairs: a set of all the gold pairs created from the
-    #                           discovered intervals
-    #        :param gold_types: all the types (n-gram) that occur in gold_pairs
-    #    """
-    #    counter = Counter()
-    #    gold_found_pairs = set()
-
-    #    def _ngram_pairs(pair):
-    #        # check if a pair should be kept as gold
-    #        # and if it intersects with discovered pairs
-    #        f1, f2 = pair
-
-    #        # check if should be kept
-    #        if (f1[0] == f2[0] and overlap((f1[1], f1[2]),
-    #                                       (f2[1], f2[2]))[0] > 0):
-    #            return (None, False)
-
-    #        # check if discovered
-    #        if (f1, f2) in self.found_pairs:
-    #            intersection = True
-    #        else:
-    #            intersection = False
-
-    #        return ((f1, f2), intersection)
-
-    #    # get all discovered intervals
-    #    same = defaultdict(set)
-    #    for fname, disc_on, disc_off, token_ngram, ngram in self.intervals:
-    #        # ngram = tuple(ph for on, off, ph in token_ngram)
-    #        same[ngram].add((fname, disc_on, disc_off, token_ngram, ngram))
-    #    # get all gold pairs
-    #    seen_token = set()
-
-    #    # parallelize over all possible pairs
-    #    for ngram in same: 
-    #        _gold_pairs_found = Parallel(n_jobs=self.njobs, backend="threading")(
-    #            delayed(_ngram_pairs)(sorted((f1, f2),
-    #                                key=lambda f: (f[0], f[1])))
-    #                               for f1, f2 in combinations(same[ngram], 2))
-
-    #        _gold_pairs = {pair for pair, found in _gold_pairs_found if pair is not None}
-    #        if len(_gold_pairs) > 0: 
-    #            self.gold_types.add(ngram)
-    #        _intersection = {pair for pair, found in _gold_pairs_found if found == True}
-    #        gold_found_pairs = gold_found_pairs.union(_intersection)
-
-    #        # update counters
-    #        for f1, f2 in _gold_pairs:
-    #            if f1[3] not in seen_token:
-    #                counter.update((f1[4],))
-    #                # count token as seen
-    #                seen_token.add(f1[3])
-    #            if f2[3] not in seen_token:
-    #                counter.update((f2[4],))
-    #                seen_token.add(f2[3])
-
-    #    # compute weights for each n gram
-    #    weights = {ngram: counter[ngram]/len(seen_token) for ngram in counter}
-    #       
-    #    return gold_found_pairs, counter, weights
-
-    #def get_gold_pairs_buggy(self):
-    #    """ Get all the gold pairs that can be created using the
-    #        discovered intervals.
-    #        The pairs are ordered by filename and onset.
-
-    #        Input
-    #        :param intervals: a list of all the discovered intervals, with
-    #                          their transcription
-    #        Output
-    #        :param gold_pairs: a set of all the gold pairs created from the
-    #                           discovered intervals
-    #        :param gold_types: all the types (n-gram) that occur in gold_pairs
-    #    """
-    #    def _ngram_pairs(ngram_list):
-    #        ngram_pairs = [tuple(sorted((f1, f2), key= lambda f:(f[0], f[1])))
-    #                       for f1, f2 in combinations(ngram_list, 2)
-    #                       if not (f1[0] == f2[0]
-    #                               and overlap((f1[1], f1[2]),
-    #                                           (f2[1], f2[2]))[0] > 0)]
-    #        return ngram_pairs
-
-    #    same = defaultdict(set)
-    #    for fname, disc_on, disc_off, token_ngram, ngram in self.intervals:
-    #        # ngram = tuple(ph for on, off, ph in token_ngram)
-    #        same[ngram].add((fname, disc_on, disc_off, token_ngram, ngram))
-
-    #    # add gold pair as tuple if both elements don't overlap
-    #    gold_pairs = {
-    #        tuple(sorted((f1, f2), key=lambda f: (f[0], f[1])))
-    #        for ngram in same
-    #        for f1, f2 in combinations(same[ngram], 2)
-    #        if not (f1[0] == f2[0]
-    #                and overlap((f1[1], f1[2]),
-    #                            (f2[1], f2[2]))[0] > 0)}
-    #    #gold_pairs = Parallel(n_jobs=15)(delayed(_ngram_pairs)(same[ngram]) for ngram in same)
-    #    gold_types = {f1[4] for f1, f2 in self.gold_pairs}
-    #    return gold_pairs, gold_types
-
     def get_gold_pairs(self):
         """ Get all the gold pairs that can be created using the
             discovered intervals.
@@ -175,21 +86,54 @@ class Grouping(Measure):
                                discovered intervals
             :param gold_types: all the types (n-gram) that occur in gold_pairs
         """
+        print('testing with dict')
         same = defaultdict(set)
+        same_int = dict()
+        self.int_same = dict()
+        same_int_idx = 0
         for fname, disc_on, disc_off, token_ngram, ngram in self.intervals:
             # ngram = tuple(ph for on, off, ph in token_ngram)
-            same[ngram].add((fname, disc_on, disc_off, token_ngram, ngram))
+            #same[ngram].add((fname, disc_on, disc_off, token_ngram, ngram))
+            if (fname, disc_on, disc_off, token_ngram, ngram) not in same_int:
+                same_int[(fname, disc_on, disc_off, token_ngram, ngram)] = same_int_idx
+                self.int_same[same_int_idx] = (fname, disc_on, disc_off, token_ngram, ngram)
+                same_int_idx += 1
+            same[ngram].add(same_int[(fname, disc_on, disc_off, token_ngram, ngram)])
 
         # add gold pair as tuple if both elements don't overlap
+
+        #self.gold_pairs = {
+        #    tuple(sorted((f1, f2), key=lambda f: (f[0], f[1])))
+        #    for ngram in same
+        #    for f1, f2 in combinations(same[ngram], 2)
+        #    if not (f1[0] == f2[0]
+        #            and overlap((f1[1], f1[2]),
+        #                        (f2[1], f2[2]))[0] > 0)}
         self.gold_pairs = {
-            tuple(sorted((f1, f2), key=lambda f: (f[0], f[1])))
+            tuple(sorted((f1, f2), key=lambda f: (self.int_same[f][0], self.int_same[f][1])))
             for ngram in same
             for f1, f2 in combinations(same[ngram], 2)
-            if not (f1[0] == f2[0]
-                    and overlap((f1[1], f1[2]),
-                                (f2[1], f2[2]))[0] > 0)}
+            if not (self.int_same[f1][0] == self.int_same[f2][0]
+                    and overlap((self.int_same[f1][1], self.int_same[f1][2]),
+                                (self.int_same[f2][1], self.int_same[f2][2]))[0] > 0)}
 
-        self.gold_types = {f1[4] for f1, f2 in self.gold_pairs}
+
+        self.gold_types = {self.int_same[f1][4] for f1, f2 in self.gold_pairs}
+        # count occurences or each interval in pairs for frequency
+        counter = Counter()
+        seen_token = set()
+        for f1, f2 in self.gold_pairs:
+            if self.int_same[f1][3] not in seen_token:
+                counter.update((self.int_same[f1][4],))
+                # count token as seen
+                seen_token.add(self.int_same[f1][3])
+            if self.int_same[f2][3] not in seen_token:
+                counter.update((self.int_same[f2][4],))
+                seen_token.add(self.int_same[f2][3])
+
+        weights = {ngram: counter[ngram]/len(seen_token) for ngram in counter}
+        return weights, counter
+
 
     def get_found_pairs(self):
         """ Get all the pairs that were found.
@@ -255,12 +199,12 @@ class Grouping(Measure):
             of each type in three sets: the set of gold pairs, the set of
             found pairs, and the intersection of gold pairs and found pairs
         """
-        self.get_gold_pairs()
+        self.gold_weights, self.gold_counter = self.get_gold_pairs()
         self.get_found_pairs()
 
         gold_found_pairs = self.found_pairs.intersection(self.gold_pairs)
-        self.gold_weights, self.gold_counter = self.get_weights(
-            self.gold_pairs)
+        #self.gold_weights, self.gold_counter = self.get_weights(
+        #    self.gold_pairs)
         ## get intersection of discovered pairs and gold pairs
         ## and count occurences and weights for gold pairs
         #gold_found_pairs, self.gold_counter, self.gold_weights = self.get_gold_pairs()
