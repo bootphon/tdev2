@@ -1,4 +1,5 @@
 import numpy as np
+# TODO import interlap
 
 #from joblib import Parallel, delayed
 from .measures import Measure
@@ -183,8 +184,8 @@ class Grouping(Measure):
             tuple(sorted((f1, f2), key=lambda f: (self.idx2term[f][0], self.idx2term[f][1])))
             for f1, f2 in self.found_pairs}
 
-    @staticmethod
-    def get_weights(pairs):
+    #@staticmethod
+    def get_weights(self, pairs):
         """ For each type get its weight
 
             Input
