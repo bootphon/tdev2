@@ -39,14 +39,30 @@ class Grouping(Measure):
         self.output_folder = output_folder
         #self.clusters = disc.clusters
         # set timestamps as int in milliseconds
-        self.clusters = dict()
-        for key in disc.clusters:
-            self.clusters[key] = [(fname, int(disc_on * 1000), int(disc_off * 1000),
-              token_ngram, ngram) for fname, disc_on, disc_off, token_ngram, ngram in disc.clusters[key]]
-
+        self.term2idx = dict()
+        self.idx2term = dict()
+        term_idx = 0
         self.intervals = list()
         for fname, disc_on, disc_off, token_ngram, ngram in disc.intervals:
-            self.intervals.append((fname, int(disc_on * 1000), int(disc_off * 1000), token_ngram, ngram))
+            if (fname, disc_on, disc_off,
+                   token_ngram, ngram) not in self.term2idx:
+                self.term2idx[(fname, disc_on, disc_off,
+                    token_ngram, ngram)] = term_idx
+                self.idx2term[term_idx] = (fname, int(1000 * disc_on),
+                        int(1000 * disc_off), token_ngram, ngram)
+                term_idx += 1
+
+            #self.intervals.append((fname, int(disc_on * 1000), int(disc_off * 1000), token_ngram, ngram))
+            self.intervals.append(self.term2idx[(fname, disc_on,
+                disc_off, token_ngram, ngram)])
+
+        self.clusters = dict()
+        for key in disc.clusters:
+            self.clusters[key] = [self.term2idx[(fname, disc_on, disc_off,
+                                                 token_ngram, ngram)]
+                    for fname, disc_on, disc_off, token_ngram, ngram
+                    in disc.clusters[key]]
+
 
         #self.intervals = disc.intervals
         self.njobs = njobs
@@ -88,17 +104,18 @@ class Grouping(Measure):
         """
         print('testing with dict')
         same = defaultdict(set)
-        same_int = dict()
-        self.int_same = dict()
-        same_int_idx = 0
-        for fname, disc_on, disc_off, token_ngram, ngram in self.intervals:
-            # ngram = tuple(ph for on, off, ph in token_ngram)
-            #same[ngram].add((fname, disc_on, disc_off, token_ngram, ngram))
-            if (fname, disc_on, disc_off, token_ngram, ngram) not in same_int:
-                same_int[(fname, disc_on, disc_off, token_ngram, ngram)] = same_int_idx
-                self.int_same[same_int_idx] = (fname, disc_on, disc_off, token_ngram, ngram)
-                same_int_idx += 1
-            same[ngram].add(same_int[(fname, disc_on, disc_off, token_ngram, ngram)])
+        #for fname, disc_on, disc_off, token_ngram, ngram in self.intervals:
+        #    # ngram = tuple(ph for on, off, ph in token_ngram)
+        #    #same[ngram].add((fname, disc_on, disc_off, token_ngram, ngram))
+        #    if (fname, disc_on, disc_off, token_ngram, ngram) not in same_int:
+        #        same_int[(fname, disc_on, disc_off, token_ngram, ngram)] = same_int_idx
+        #        self.int_same[same_int_idx] = (fname, disc_on, disc_off, token_ngram, ngram)
+        #        same_int_idx += 1
+        #    same[ngram].add(same_int[(fname, disc_on, disc_off, token_ngram, ngram)])
+        for term_idx in self.intervals:
+            # get ngram
+            _, _, _, _, ngram = self.idx2term[term_idx]
+            same[ngram].add(term_idx)
 
         # add gold pair as tuple if both elements don't overlap
 
@@ -110,29 +127,29 @@ class Grouping(Measure):
         #            and overlap((f1[1], f1[2]),
         #                        (f2[1], f2[2]))[0] > 0)}
         self.gold_pairs = {
-            tuple(sorted((f1, f2), key=lambda f: (self.int_same[f][0], self.int_same[f][1])))
+            tuple(sorted((f1, f2), key=lambda f: (self.idx2term[f][0], self.idx2term[f][1])))
             for ngram in same
             for f1, f2 in combinations(same[ngram], 2)
-            if not (self.int_same[f1][0] == self.int_same[f2][0]
-                    and overlap((self.int_same[f1][1], self.int_same[f1][2]),
-                                (self.int_same[f2][1], self.int_same[f2][2]))[0] > 0)}
+            if not (self.idx2term[f1][0] == self.idx2term[f2][0]
+                    and overlap((self.idx2term[f1][1], self.idx2term[f1][2]),
+                                (self.idx2term[f2][1], self.idx2term[f2][2]))[0] > 0)}
 
 
-        self.gold_types = {self.int_same[f1][4] for f1, f2 in self.gold_pairs}
-        # count occurences or each interval in pairs for frequency
-        counter = Counter()
-        seen_token = set()
-        for f1, f2 in self.gold_pairs:
-            if self.int_same[f1][3] not in seen_token:
-                counter.update((self.int_same[f1][4],))
-                # count token as seen
-                seen_token.add(self.int_same[f1][3])
-            if self.int_same[f2][3] not in seen_token:
-                counter.update((self.int_same[f2][4],))
-                seen_token.add(self.int_same[f2][3])
+        self.gold_types = {self.idx2term[f1][4] for f1, f2 in self.gold_pairs}
+        ## count occurences or each interval in pairs for frequency
+        #counter = Counter()
+        #seen_token = set()
+        #for f1, f2 in self.gold_pairs:
+        #    if self.idx2term[f1][3] not in seen_token:
+        #        counter.update((self.i[f1][4],))
+        #        # count token as seen
+        #        seen_token.add(self.int_same[f1][3])
+        #    if self.int_same[f2][3] not in seen_token:
+        #        counter.update((self.int_same[f2][4],))
+        #        seen_token.add(self.int_same[f2][3])
 
-        weights = {ngram: counter[ngram]/len(seen_token) for ngram in counter}
-        return weights, counter
+        #weights = {ngram: counter[ngram]/len(seen_token) for ngram in counter}
+        #return weights, counter
 
 
     def get_found_pairs(self):
@@ -151,14 +168,19 @@ class Grouping(Measure):
                 set(combinations(self.clusters[class_nb], 2)))
 
             # count type only if clusters has two elements
-            if len(self.clusters[class_nb]) > 1 :
+            #if len(self.clusters[class_nb]) > 1 :
+            #    self.found_types = self.found_types.union(
+            #        {ngram for _, _, _, token_ngram, ngram
+            #        in self.clusters[class_nb]})
+            if len(self.clusters[class_nb]) > 1:
                 self.found_types = self.found_types.union(
-                    {ngram for _, _, _, token_ngram, ngram
-                    in self.clusters[class_nb]})
+                    {self.idx2term[term_idx][4]
+                        for term_idx in self.clusters[class_nb]})
+
 
         # order found pairs
         self.found_pairs = {
-            tuple(sorted((f1, f2), key=lambda f: (f[0], f[1])))
+            tuple(sorted((f1, f2), key=lambda f: (self.idx2term[f][0], self.idx2term[f][1])))
             for f1, f2 in self.found_pairs}
 
     @staticmethod
@@ -183,13 +205,13 @@ class Grouping(Measure):
         counter = Counter()
         seen_token = set()
         for f1, f2 in pairs:
-            if f1[3] not in seen_token:
-                counter.update((f1[4],))
+            if self.idx2term[f1][3] not in seen_token:
+                counter.update((self.idx2term[f1][4],))
                 # count token as seen
-                seen_token.add(f1[3])
-            if f2[3] not in seen_token:
-                counter.update((f2[4],))
-                seen_token.add(f2[3])
+                seen_token.add(self.idx2term[f1][3])
+            if self.idx2term[f2][3] not in seen_token:
+                counter.update((self.idx2term[f2][4],))
+                seen_token.add(self.idx2term[f2][3])
 
         weights = {ngram: counter[ngram]/len(seen_token) for ngram in counter}
         return weights, counter
@@ -199,12 +221,12 @@ class Grouping(Measure):
             of each type in three sets: the set of gold pairs, the set of
             found pairs, and the intersection of gold pairs and found pairs
         """
-        self.gold_weights, self.gold_counter = self.get_gold_pairs()
+        self.get_gold_pairs()
         self.get_found_pairs()
 
         gold_found_pairs = self.found_pairs.intersection(self.gold_pairs)
-        #self.gold_weights, self.gold_counter = self.get_weights(
-        #    self.gold_pairs)
+        self.gold_weights, self.gold_counter = self.get_weights(
+            self.gold_pairs)
         ## get intersection of discovered pairs and gold pairs
         ## and count occurences and weights for gold pairs
         #gold_found_pairs, self.gold_counter, self.gold_weights = self.get_gold_pairs()
