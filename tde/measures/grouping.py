@@ -5,7 +5,7 @@ import numpy as np
 from .measures import Measure
 from itertools import combinations
 from collections import defaultdict, Counter
-from tde.utils import overlap
+from tde.utils import overlap, has_overlap
 
 
 class Grouping(Measure):
@@ -132,8 +132,8 @@ class Grouping(Measure):
             for ngram in same
             for f1, f2 in combinations(same[ngram], 2)
             if not (self.idx2term[f1][0] == self.idx2term[f2][0]
-                    and overlap((self.idx2term[f1][1], self.idx2term[f1][2]),
-                                (self.idx2term[f2][1], self.idx2term[f2][2]))[0] > 0)}
+                    and has_overlap((self.idx2term[f1][1], self.idx2term[f1][2]),
+                                (self.idx2term[f2][1], self.idx2term[f2][2])))}
 
 
         self.gold_types = {self.idx2term[f1][4] for f1, f2 in self.gold_pairs}

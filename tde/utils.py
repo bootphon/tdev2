@@ -49,3 +49,11 @@ def overlap(disc, gold):
         / (gold[1] - gold[0])
     time = round(np.min([disc[1], gold[1]]) - np.max([disc[0], gold[0]]), 3)
     return ov, time
+
+def has_overlap(disc, gold):
+    """Return True if two intervals overlap, False if not"""
+    if (disc[1] < gold[0] or
+        gold[1] < disc[0]):
+        return False
+    else:
+        return True
