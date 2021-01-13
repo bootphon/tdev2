@@ -7,9 +7,9 @@ Term Discovery Evaluation
 Toolbox to evaluate  Term Discovery systems.
 
 * Complete Documentation and metrics description ar
-  available at https://docs.syntheticlearner.net/tde/
+  available at https://docs.cognitive-ml.fr/tde/
 
-This toolbox transcribed phonetical each discovered interval, then applies 
+This toolbox transcribed phonetical each discovered interval, then applies
 NLP evaluation to judge the quality of the discovery.
 The metrics are:
 - NED : mean of the edit distance between all the discovered pairs

@@ -1,6 +1,6 @@
 before_script:
   # load the requested modules on oberon
-  - module load anaconda/3 
+  - module load anaconda/3
 
 tdev2-build:
   stage: build
@@ -38,7 +38,7 @@ documentation:
     - conda activate TDE
       #- python setup.py test
     - sphinx-build docs/source docs/build
-    - scp -r docs/build/* syntheticlearner.net:/var/www/docs.syntheticlearner.net/tde
+    - scp -r docs/build/* cognitive-ml.fr:/var/www/docs.cognitive-ml.fr/tde
 
 # deploy on anaconda
 # deploy-conda:
@@ -52,4 +52,3 @@ documentation:
 #    - cd .conda
 #    - conda build  -c conda-forge --user coml --token $CONDA_TOKEN --skip-existing .
 #    - conda build purge
-
