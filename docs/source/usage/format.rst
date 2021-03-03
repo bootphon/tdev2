@@ -6,7 +6,7 @@ File Formats
 Input Format
 ------------
 
-The package takes as input the same format as in the 
+The package takes as input the same format as in the
 Zero Resource Speech Challenge (zerospeech.com):
 
 
@@ -21,19 +21,21 @@ Zero Resource Speech Challenge (zerospeech.com):
     wav3 on4 off4
     wav2 on5 off5
 
-Note that each class should end with an empty line, including the last
-class of the file. 
+The ``onset`` and ``offset`` times are expressed **in seconds**.
 
-If you want to use other input formats, you need to edit the 
-`read_clusters` method in `tde/readers/disc_reader.py`.
+Note that each class must end with an empty line, including the last class of
+the file. So **the file must be terminated by a blank line**.
+
+If you want to use other input formats, you need to edit the
+``read_clusters`` method in ``tde/readers/disc_reader.py``.
 
 Alignments
 ----------
 
 The package uses gold phone and words alignments to evaluate the inputs.
-The alignments are stored in `tde/share`. 
+The alignments are stored in ``tde/share``.
 
-The formats for the alignements is (without header): 
+The formats for the alignements is (without header):
 
 .. code-block:: bash
 
@@ -44,5 +46,6 @@ The formats for the alignements is (without header):
 Where `filename` are the names of the wavs, and `symbol` are the words or
 phones.
 
-To add your own language in the package, you need to add `yourlang.phn` and
-`yourlang.wrd` in `tde/share` and add the option in `tde/eval.py` (line 39)
+To add your own language in the package, you need to add ``yourlang.phn`` and
+``yourlang.wrd`` in ``tde/share`` and add the option in ``tde/eval.py``
+(line 39).
