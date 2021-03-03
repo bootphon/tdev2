@@ -9,10 +9,10 @@ from tde.utils import overlap
 
 class Grouping(Measure):
     """Grouping measure
-    
+
     The grouping measures how pure the found clusters are, and
     is close to the 'purity' measure in clustering.
-    See https://docs.syntheticlearner.net/tde/measures/index.html
+    See https://docs.cognitive-ml.fr/tde/measures/index.html
     for a summary of all measures.
 
     Input
@@ -97,14 +97,14 @@ class Grouping(Measure):
     #    seen_token = set()
 
     #    # parallelize over all possible pairs
-    #    for ngram in same: 
+    #    for ngram in same:
     #        _gold_pairs_found = Parallel(n_jobs=self.njobs, backend="threading")(
     #            delayed(_ngram_pairs)(sorted((f1, f2),
     #                                key=lambda f: (f[0], f[1])))
     #                               for f1, f2 in combinations(same[ngram], 2))
 
     #        _gold_pairs = {pair for pair, found in _gold_pairs_found if pair is not None}
-    #        if len(_gold_pairs) > 0: 
+    #        if len(_gold_pairs) > 0:
     #            self.gold_types.add(ngram)
     #        _intersection = {pair for pair, found in _gold_pairs_found if found == True}
     #        gold_found_pairs = gold_found_pairs.union(_intersection)
@@ -121,7 +121,7 @@ class Grouping(Measure):
 
     #    # compute weights for each n gram
     #    weights = {ngram: counter[ngram]/len(seen_token) for ngram in counter}
-    #       
+    #
     #    return gold_found_pairs, counter, weights
 
     #def get_gold_pairs_buggy(self):
@@ -269,7 +269,6 @@ class Grouping(Measure):
         self.found_weights, self.found_counter = self.get_weights(
             self.found_pairs)
 
-        # count occurences and weights for intersection of gold and 
+        # count occurences and weights for intersection of gold and
         # found pairs
         _, self.found_gold_counter = self.get_weights(gold_found_pairs)
-

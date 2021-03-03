@@ -5,9 +5,9 @@ from .measures import Measure
 
 class Coverage(Measure):
     """Coverage measure
-    
+
     The coverage measures how many 'Gold' phonemes were found.
-    See https://docs.syntheticlearner.net/tde/measures/index.html
+    See https://docs.cognitive-ml.fr/tde/measures/index.html
     for a summary of all measures.
 
     Input

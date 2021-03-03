@@ -4,9 +4,9 @@ from .measures import Measure
 
 class Boundary(Measure):
     """Boundary measure
-    
+
     The boundary measures how many 'Gold' boundaries were found.
-    See https://docs.syntheticlearner.net/tde/measures/index.html for
+    See https://docs.cognitive-ml.fr/tde/measures/index.html for
     a summary of all measures.
 
     Input

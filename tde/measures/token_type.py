@@ -7,12 +7,12 @@ from tde.utils import overlap
 
 class TokenType(Measure):
     """Token Type measure
-    
+
     The Token measures how many 'Gold' token were found.
     The Type measures how many 'Gold' type were found.
     A 'Type' is a word type, and a 'token' is a specific occurence
     of a 'type'.
-    See https://docs.syntheticlearner.net/tde/measures/index.html
+    See https://docs.cognitive-ml.fr/tde/measures/index.html
     for a summary of all measures.
 
     Input
@@ -204,4 +204,3 @@ class TokenType(Measure):
             fout.write("precision: {}\n".format(type_prec))
             fout.write("recall: {}\n".format(type_rec))
             fout.write("fscore: {}\n".format(type_fscore))
-

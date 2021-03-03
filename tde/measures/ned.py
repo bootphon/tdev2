@@ -7,12 +7,12 @@ from itertools import combinations
 
 class Ned(Measure):
     """NED measure
-    
-    The NED (Normalized Edit Distance) measures how close each 
-    pair of word found is. For 1 pair of intervals found, a 
+
+    The NED (Normalized Edit Distance) measures how close each
+    pair of word found is. For 1 pair of intervals found, a
     NED of 1 means all the phonemes are different, and a NED of 0 means
     they contain the exact same phonemes in the same order.
-    See https://docs.syntheticlearner.net/tde/measures/index.html 
+    See https://docs.cognitive-ml.fr/tde/measures/index.html
     for a summary of all measures.
 
     Input
